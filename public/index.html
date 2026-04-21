@@ -2,96 +2,1531 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="theme-color" content="#FF4D14">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>LEGENDIARIO</title>
   <link rel="manifest" href="/manifest.json">
-  <link rel="icon" href="/icons/icon-192.png">
+  <link rel="icon" href="https://res.cloudinary.com/dlzrfhwin/image/upload/v1776770400/legendiario-icon-192_fxbguo.png">
+  <link rel="apple-touch-icon" href="https://res.cloudinary.com/dlzrfhwin/image/upload/v1776770400/legendiario-icon-192_fxbguo.png">
 
-  <!-- OpenGraph / social share -->
+  <!-- OpenGraph -->
   <meta property="og:title" content="LEGENDIARIO">
   <meta property="og:description" content="365 dias de confronto, fé e posicionamento">
   <meta property="og:image" content="https://res.cloudinary.com/dlzrfhwin/image/upload/v1776770398/legendiario-mark-orange_kex0ij.png">
   <meta property="og:url" content="https://app.legendiario.com">
   <meta name="twitter:card" content="summary_large_image">
 
-  <!-- Meta Pixel (preencher quando tiver PIXEL ID) -->
-  <!-- <script>/* PIXEL_ID_PLACEHOLDER */</script> -->
-  <!-- GA4 (preencher quando tiver ID) -->
-  <!-- <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script> -->
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400;1,9..144,500&display=swap" rel="stylesheet">
 
   <style>
     :root {
-      --brand-primary: #FF4D14;     /* Laranja Legendário */
-      --brand-secondary: #0A0A0A;   /* Preto Militar */
-      /* Cores dinâmicas por autor (10 personas) — sobrescritas em JS conforme autor do dia */
-      --author-color: #FF4D14;      /* default = Caleb (primária) */
-      --bg: #FAFAFA;
-      --text: #1A1A1A;
+      --brand: #FF4D14;
+      --brand-dark: #D63C0A;
+      --black: #0A0A0A;
+      --bg: #0A0A0A;
+      --bg-card: #1A1A1A;
+      --bg-card-2: #252525;
+      --text: #FFFFFF;
+      --text-dim: #9A9A9A;
+      --text-muted: #5A5A5A;
+      --border: #2A2A2A;
+      --ok: #2D4A2B;
+      --danger: #8B0000;
+      --warn: #D4A017;
       --camo-olive: #4B5320;
       --camo-sand: #6B5D4F;
       --camo-khaki: #8B7E66;
+      --camo-dark: #333D26;
+      --author-color: var(--brand);
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: -apple-system, sans-serif; background: var(--bg); color: var(--text); }
 
-    /* Bloqueio de landscape em mobile */
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+    html, body {
+      height: 100%;
+      overscroll-behavior: none;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+    input, textarea, select {
+      font-family: inherit;
+      background: var(--bg-card);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-size: 16px;
+      width: 100%;
+    }
+    input:focus, textarea:focus, select:focus { outline: 2px solid var(--brand); border-color: transparent; }
+
+    /* ---------------------- App shell ---------------------- */
+    #app {
+      max-width: 520px;
+      margin: 0 auto;
+      min-height: 100vh;
+      padding-bottom: 80px;
+      position: relative;
+    }
+
+    /* Top bar */
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 20px 12px;
+      background: var(--bg);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      border-bottom: 1px solid var(--border);
+    }
+    .topbar .brand-mark {
+      height: 24px;
+      display: block;
+    }
+    .topbar .credits {
+      background: var(--bg-card);
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--brand);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Views */
+    .view { display: none; padding: 20px; animation: fade 0.2s; }
+    .view.active { display: block; }
+    @keyframes fade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+    /* Bottom tab bar */
+    .tab-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      max-width: 520px;
+      margin: 0 auto;
+      display: flex;
+      background: var(--black);
+      border-top: 1px solid var(--border);
+      padding: 8px 0 calc(8px + env(safe-area-inset-bottom));
+      z-index: 20;
+    }
+    .tab-bar button {
+      flex: 1;
+      padding: 8px 4px 4px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      transition: color 0.15s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+    .tab-bar button.active { color: var(--brand); }
+    .tab-bar .tab-icon {
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+
+    /* Headlines */
+    .h1 { font-family: 'Inter'; font-weight: 900; font-size: 28px; letter-spacing: -0.5px; line-height: 1.2; }
+    .h2 { font-family: 'Inter'; font-weight: 800; font-size: 22px; letter-spacing: -0.3px; }
+    .h3 { font-family: 'Inter'; font-weight: 700; font-size: 16px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-dim); }
+    .muted { color: var(--text-dim); }
+    .tiny { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+
+    /* Primary button */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 14px 24px;
+      border-radius: 4px;
+      font-weight: 800;
+      font-size: 15px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      transition: transform 0.1s, opacity 0.15s;
+      user-select: none;
+    }
+    .btn:active { transform: scale(0.97); }
+    .btn-primary { background: var(--brand); color: white; }
+    .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-secondary { background: transparent; color: var(--text); border: 1px solid var(--border); }
+    .btn-ghost { background: transparent; color: var(--text-dim); }
+    .btn-full { width: 100%; }
+
+    /* Cards */
+    .card {
+      background: var(--bg-card);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 14px;
+      border: 1px solid var(--border);
+    }
+
+    /* ---------------------- LOGIN ---------------------- */
+    #login-view {
+      min-height: 100vh;
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      padding: 40px 28px;
+      background: var(--bg);
+      max-width: 520px;
+      margin: 0 auto;
+    }
+    #login-view.active { display: flex; }
+    .login-logo { display: block; width: 80%; max-width: 280px; margin: 0 auto 32px; }
+    .login-tagline {
+      text-align: center;
+      font-family: 'Fraunces';
+      font-style: italic;
+      font-size: 18px;
+      color: var(--text-dim);
+      margin-bottom: 40px;
+      line-height: 1.4;
+    }
+    .login-form { display: flex; flex-direction: column; gap: 14px; }
+    .login-msg { text-align: center; padding: 12px; border-radius: 8px; font-size: 14px; display: none; }
+    .login-msg.ok { display: block; background: rgba(45, 74, 43, 0.3); color: #7ab87a; }
+    .login-msg.err { display: block; background: rgba(139, 0, 0, 0.3); color: #ff6b6b; }
+
+    /* ---------------------- HOJE ---------------------- */
+    .hoje-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 6px;
+    }
+    .hoje-date { color: var(--author-color); font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: 2px; }
+    .hoje-dia-n { color: var(--text-muted); font-size: 13px; font-weight: 600; }
+
+    .provocacao-card {
+      background: var(--bg-card);
+      border-radius: 16px;
+      padding: 28px 24px;
+      margin-bottom: 20px;
+      border-left: 4px solid var(--author-color);
+    }
+    .citacao-block {
+      border-left: 3px solid var(--author-color);
+      padding-left: 14px;
+      margin-bottom: 24px;
+    }
+    .citacao {
+      font-family: 'Fraunces';
+      font-style: italic;
+      font-size: 18px;
+      line-height: 1.4;
+      color: var(--text);
+    }
+    .citacao-ref { display: block; margin-top: 6px; font-size: 11px; color: var(--author-color); text-transform: uppercase; letter-spacing: 2px; font-weight: 700; font-family: 'Inter'; font-style: normal; }
+
+    .pergunta {
+      font-family: 'Fraunces';
+      font-style: italic;
+      font-weight: 500;
+      font-size: 20px;
+      line-height: 1.35;
+      color: var(--text);
+      margin-bottom: 22px;
+    }
+
+    .texto {
+      font-size: 15.5px;
+      line-height: 1.7;
+      color: var(--text);
+      white-space: pre-wrap;
+    }
+    .texto-collapsed { max-height: 180px; overflow: hidden; position: relative; }
+    .texto-collapsed::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 60px;
+      background: linear-gradient(transparent, var(--bg-card));
+    }
+    .ler-mais { display: block; margin: 12px 0; color: var(--author-color); font-weight: 700; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; }
+
+    .aspas-final {
+      margin-top: 24px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+    }
+    .aspas-texto { font-family: 'Fraunces'; font-style: italic; font-size: 17px; line-height: 1.4; color: var(--text); }
+    .aspas-autor {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 14px;
+      font-size: 13px;
+      color: var(--text-dim);
+      font-family: 'Inter';
+      font-style: normal;
+    }
+    .author-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--author-color); flex-shrink: 0; }
+    .author-nome { font-weight: 700; color: var(--text); }
+    .author-num { color: var(--author-color); font-weight: 600; font-variant-numeric: tabular-nums; }
+
+    /* Hoje actions */
+    .hoje-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 24px;
+    }
+    .share-row { display: flex; gap: 10px; }
+    .share-row .btn { flex: 1; }
+
+    .read-btn {
+      width: 100%;
+      padding: 18px;
+      background: var(--author-color);
+      color: white;
+      border-radius: 4px;
+      font-weight: 900;
+      font-size: 15px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      transition: all 0.2s;
+    }
+    .read-btn.already-read {
+      background: var(--ok);
+      color: #c4e8c4;
+    }
+
+    /* ---------------------- DIAS (calendário) ---------------------- */
+    .mes-block { margin-bottom: 28px; }
+    .mes-titulo {
+      font-weight: 800;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--text-dim);
+      margin-bottom: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+    .mes-stats { color: var(--text-muted); font-weight: 600; font-size: 11px; }
+    .dias-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+    .dia-cell {
+      aspect-ratio: 1;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      background: var(--bg-card);
+      color: var(--text-muted);
+      border: 1px solid transparent;
+      transition: all 0.15s;
+      user-select: none;
+    }
+    .dia-cell.dia-lido { background: var(--ok); color: #c4e8c4; }
+    .dia-cell.dia-perdido { background: transparent; color: var(--danger); border-color: var(--danger); }
+    .dia-cell.dia-hoje { background: var(--brand); color: white; box-shadow: 0 0 0 3px rgba(255, 77, 20, 0.25); }
+    .dia-cell.dia-futuro { background: var(--bg-card); color: var(--text-muted); opacity: 0.4; }
+    .dia-cell.dia-desbloqueado { background: var(--camo-olive); color: #d4e4b4; }
+
+    /* Modal */
+    .modal-backdrop {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 100;
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+    }
+    .modal-backdrop.active { display: flex; }
+    .modal {
+      background: var(--bg-card);
+      width: 100%;
+      max-width: 520px;
+      border-radius: 16px 16px 0 0;
+      padding: 24px 20px calc(24px + env(safe-area-inset-bottom));
+      max-height: 85vh;
+      overflow-y: auto;
+      animation: slideUp 0.25s;
+    }
+    @keyframes slideUp { from { transform: translateY(100%); } to { transform: none; } }
+    .modal-close { position: absolute; top: 18px; right: 18px; font-size: 28px; color: var(--text-dim); line-height: 1; }
+    .modal-title { font-weight: 800; font-size: 18px; margin-bottom: 12px; padding-right: 40px; }
+
+    /* ---------------------- AÇÕES ---------------------- */
+    .tabs {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 20px;
+      gap: 20px;
+    }
+    .tabs button {
+      padding: 12px 0;
+      font-weight: 700;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+    }
+    .tabs button.active { color: var(--brand); border-bottom-color: var(--brand); }
+
+    .action-item {
+      display: flex;
+      gap: 14px;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+      align-items: flex-start;
+    }
+    .check {
+      flex-shrink: 0;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 2px solid var(--text-muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      color: transparent;
+      transition: all 0.15s;
+      margin-top: 2px;
+    }
+    .check.done {
+      background: var(--ok);
+      border-color: var(--ok);
+      color: #c4e8c4;
+    }
+    .action-title.done { text-decoration: line-through; color: var(--text-dim); }
+    .action-body { flex: 1; }
+    .action-meta { font-size: 12px; color: var(--text-muted); margin-top: 4px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+
+    .action-input-row { display: flex; gap: 8px; margin-bottom: 18px; }
+    .action-input-row input { flex: 1; }
+    .action-input-row button { flex-shrink: 0; padding: 12px 18px; }
+
+    /* ---------------------- RITMO ---------------------- */
+    .kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
+    .kpi {
+      background: var(--bg-card);
+      border-radius: 12px;
+      padding: 18px 12px;
+      text-align: center;
+      border: 1px solid var(--border);
+    }
+    .kpi-n { font-size: 32px; font-weight: 900; color: var(--brand); line-height: 1; font-variant-numeric: tabular-nums; }
+    .kpi-label { font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: var(--text-dim); margin-top: 6px; font-weight: 700; }
+
+    .ciclo-bar {
+      height: 8px;
+      background: var(--bg-card);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 12px;
+    }
+    .ciclo-fill { height: 100%; background: var(--brand); transition: width 0.4s; }
+
+    .badge {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px;
+      background: var(--bg-card);
+      border-radius: 10px;
+      margin-bottom: 10px;
+      border: 1px solid var(--border);
+    }
+    .badge.locked { opacity: 0.35; }
+    .badge-icon {
+      width: 40px; height: 40px;
+      background: var(--brand);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      color: white;
+      flex-shrink: 0;
+    }
+    .badge-title { font-weight: 700; font-size: 14px; }
+    .badge-desc { font-size: 12px; color: var(--text-dim); margin-top: 2px; }
+
+    .rank-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .rank-pos { width: 30px; font-weight: 800; color: var(--text-dim); font-variant-numeric: tabular-nums; }
+    .rank-name { flex: 1; font-weight: 600; }
+    .rank-val { font-weight: 700; color: var(--brand); font-variant-numeric: tabular-nums; }
+    .rank-item.me { background: rgba(255, 77, 20, 0.1); padding-left: 10px; margin: 0 -10px; border-radius: 8px; }
+    .rank-item.me .rank-pos { color: var(--brand); }
+
+    /* ---------------------- CONTA ---------------------- */
+    .form-row {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+    .form-row label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-dim);
+      font-weight: 700;
+    }
+
+    .section-divider {
+      height: 1px;
+      background: var(--border);
+      margin: 28px 0 20px;
+    }
+
+    /* Loading */
+    .spinner {
+      display: inline-block;
+      width: 20px; height: 20px;
+      border: 2.5px solid rgba(255,255,255,0.2);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .loading-full {
+      position: fixed; inset: 0; z-index: 999;
+      background: var(--bg);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 20px;
+    }
+    .loading-full.hidden { display: none; }
+    .loading-full .brand-mark { width: 180px; opacity: 0.5; }
+
+    /* Toast */
+    #toast {
+      position: fixed; bottom: 100px; left: 20px; right: 20px;
+      max-width: 480px; margin: 0 auto;
+      background: var(--black);
+      color: white;
+      padding: 14px 18px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      transform: translateY(150%);
+      transition: transform 0.3s;
+      z-index: 200;
+      border: 1px solid var(--brand);
+      text-align: center;
+    }
+    #toast.show { transform: none; }
+
+    /* Landscape block */
     @media screen and (orientation: landscape) and (max-width: 900px) {
-      #landscape-overlay { display: flex; }
-      #app-root { display: none; }
+      #landscape-overlay { display: flex !important; }
+      #app, #login-view, .tab-bar { display: none !important; }
     }
-    #landscape-overlay { display: none; position: fixed; inset: 0; background: var(--brand-primary);
-      color: white; justify-content: center; align-items: center; z-index: 9999; text-align: center; padding: 2rem; }
-
-    /* Tab bar bottom */
-    .tab-bar { position: fixed; bottom: 0; left: 0; right: 0; display: flex; background: white;
-      border-top: 1px solid #eee; padding: 0.5rem 0; }
-    .tab-bar button { flex: 1; background: none; border: none; font-size: 0.75rem; color: #888; }
-    .tab-bar button.active { color: var(--brand-primary); }
+    #landscape-overlay {
+      display: none;
+      position: fixed; inset: 0;
+      background: var(--brand);
+      color: white;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 2rem;
+      z-index: 999;
+    }
   </style>
 </head>
 <body>
 
+<!-- Landscape block -->
 <div id="landscape-overlay">
   <div>
-    <h1>LEGENDIARIO</h1>
-    <p>Gire o aparelho para a posição vertical.</p>
+    <h1 style="font-weight:900; letter-spacing:-1px; margin-bottom:8px;">LEGENDIARIO</h1>
+    <p style="opacity:0.9">Gire o aparelho para vertical.</p>
   </div>
 </div>
 
-<div id="app-root">
-  <!--
-    IMPLEMENTAR 5 TELAS (conforme Manual Técnico seção 5):
-      1. HOJE — provocação do dia, toggle lido, botão compartilhar WA/Stories, "Ler mais..."
-      2. DIAS — calendário 12 meses, bolinhas teal/vermelha, desbloqueio com crédito
-      3. AÇÕES — listar compromissos, toggle done/pending, aba lembretes com date picker
-      4. RITMO — 3 abas: Meu Ritmo (streak + ciclo), Conquistas (badges), Ranking (Top 10 absoluto, depois percentil)
-      5. CONTA — editar perfil, whatsapp_hour, profissão, estado, cidade, logout
-  -->
+<!-- Splash loading -->
+<div id="loading" class="loading-full">
+  <img src="https://res.cloudinary.com/dlzrfhwin/image/upload/v1776770398/legendiario-mark-orange_kex0ij.png" alt="LEGENDIARIO" class="brand-mark">
+  <div class="spinner"></div>
 </div>
 
-<nav class="tab-bar">
-  <button data-view="hoje" class="active">Hoje</button>
-  <button data-view="dias">Dias</button>
-  <button data-view="acoes">Ações</button>
-  <button data-view="ritmo">Ritmo</button>
-  <button data-view="conta">Conta</button>
-</nav>
+<!-- LOGIN VIEW -->
+<div id="login-view">
+  <img src="https://res.cloudinary.com/dlzrfhwin/image/upload/v1776770398/legendiario-mark-orange_kex0ij.png" alt="LEGENDIARIO" class="login-logo">
+  <div class="login-tagline">365 dias de confronto,<br>fé e posicionamento.</div>
+  <form class="login-form" id="login-form">
+    <input type="email" id="login-email" placeholder="teu email" required autocomplete="email" inputmode="email">
+    <button type="submit" class="btn btn-primary btn-full" id="login-submit">
+      Enviar link de acesso
+    </button>
+    <div class="login-msg" id="login-msg"></div>
+  </form>
+  <p style="text-align:center; color:var(--text-muted); font-size:12px; margin-top:32px;">
+    Ainda não tem acesso? <a href="https://legendiario.com" style="color:var(--brand); font-weight:600;">Começar em legendiario.com</a>
+  </p>
+</div>
 
-<script>
-  // Inicialização: checar sessão Supabase Auth, carregar /api/state, /api/provocacoes/full
-  // Renderizar tela ativa. Service Worker register.
-  if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js');
+<!-- APP (shell + views) -->
+<div id="app" style="display:none">
+  <!-- Topbar (muda por view) -->
+  <div class="topbar">
+    <img src="https://res.cloudinary.com/dlzrfhwin/image/upload/v1776770398/legendiario-mark-orange_kex0ij.png" alt="LEGENDIARIO" class="brand-mark">
+    <div class="credits" id="credits-badge">
+      <span>⚡</span> <span id="credits-n">0</span>
+    </div>
+  </div>
 
-  // Lógica de estado (STATE) — ver Manual Técnico seção 5:
-  //   subscriptionStart, readDays (Set), unlockedDays (Set), credits, streak, bestStreak, shares, tasks
-  //
-  // Funções-chave:
-  //   isUnlocked(id)          — dia atual OU lido OU desbloqueado
-  //   isWithinSubscription(id) — dia entre subscriptionStart e hoje
-  //   isMissedDay(id)          — dentro da assinatura + passado + não lido
-  //   useCredit()              — gasta 1 crédito, adiciona em unlockedDays
-  //   authorDisplay(autor)     — retorna cor por autor (teal/gold)
+  <!-- 1. HOJE -->
+  <section class="view active" id="view-hoje">
+    <div class="hoje-header">
+      <div class="hoje-date" id="hoje-date">—</div>
+      <div class="hoje-dia-n" id="hoje-dia-n">DIA —</div>
+    </div>
+
+    <div class="provocacao-card" id="hoje-card">
+      <div class="citacao-block">
+        <div class="citacao" id="hoje-citacao">—</div>
+        <span class="citacao-ref" id="hoje-citacao-ref"></span>
+      </div>
+
+      <div class="pergunta" id="hoje-pergunta">—</div>
+
+      <div class="texto" id="hoje-texto">—</div>
+      <a class="ler-mais" id="hoje-ler-mais" style="display:none">LER MAIS ↓</a>
+
+      <div class="aspas-final">
+        <div class="aspas-texto" id="hoje-aspas">—</div>
+        <div class="aspas-autor">
+          <span class="author-dot"></span>
+          <span class="author-nome" id="hoje-autor-nome">—</span>
+          <span class="author-num" id="hoje-autor-num">—</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="hoje-actions">
+      <button class="read-btn" id="btn-lido">MARCAR COMO LIDO</button>
+      <div class="share-row">
+        <button class="btn btn-secondary" id="btn-share-wa">
+          Compartilhar WhatsApp
+        </button>
+        <button class="btn btn-secondary" id="btn-share-story">
+          Stories
+        </button>
+      </div>
+      <button class="btn btn-ghost btn-full" id="btn-criar-acao">
+        + Criar ação a partir desta provocação
+      </button>
+    </div>
+  </section>
+
+  <!-- 2. DIAS -->
+  <section class="view" id="view-dias">
+    <h2 class="h2" style="margin-bottom:6px">365 dias</h2>
+    <p class="muted" style="margin-bottom:24px; font-size:14px;" id="dias-resumo">— lidos · — perdidos</p>
+    <div id="meses-container"></div>
+  </section>
+
+  <!-- 3. AÇÕES -->
+  <section class="view" id="view-acoes">
+    <h2 class="h2" style="margin-bottom:16px">Ações</h2>
+    <div class="tabs">
+      <button class="active" data-tab-acoes="pendentes">Pendentes</button>
+      <button data-tab-acoes="lembretes">Lembretes</button>
+      <button data-tab-acoes="feitas">Feitas</button>
+    </div>
+
+    <div id="acoes-pendentes-tab">
+      <div class="action-input-row">
+        <input id="new-action-input" placeholder="Nova ação..." maxlength="140">
+        <button class="btn btn-primary" id="new-action-btn">+</button>
+      </div>
+      <div id="acoes-pendentes-list"></div>
+    </div>
+
+    <div id="acoes-lembretes-tab" style="display:none">
+      <div class="action-input-row">
+        <input id="new-reminder-input" placeholder="Lembrete...">
+        <input type="date" id="new-reminder-date" style="max-width:160px">
+        <button class="btn btn-primary" id="new-reminder-btn">+</button>
+      </div>
+      <div id="acoes-lembretes-list"></div>
+    </div>
+
+    <div id="acoes-feitas-tab" style="display:none">
+      <div id="acoes-feitas-list"></div>
+    </div>
+  </section>
+
+  <!-- 4. RITMO -->
+  <section class="view" id="view-ritmo">
+    <h2 class="h2" style="margin-bottom:16px">Ritmo</h2>
+    <div class="tabs">
+      <button class="active" data-tab-ritmo="meu">Meu Ritmo</button>
+      <button data-tab-ritmo="conquistas">Conquistas</button>
+      <button data-tab-ritmo="ranking">Ranking</button>
+    </div>
+
+    <div id="ritmo-meu-tab">
+      <div class="kpi-grid">
+        <div class="kpi">
+          <div class="kpi-n" id="kpi-streak">0</div>
+          <div class="kpi-label">Ofensiva</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-n" id="kpi-best">0</div>
+          <div class="kpi-label">Melhor</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-n" id="kpi-total">0</div>
+          <div class="kpi-label">Total lidos</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="h3" style="margin-bottom:8px">Ciclo atual</div>
+        <p style="font-size:14px; color:var(--text-dim);">
+          <span id="ciclo-dia">—</span> de 30 dias
+        </p>
+        <div class="ciclo-bar"><div class="ciclo-fill" id="ciclo-fill" style="width:0%"></div></div>
+      </div>
+
+      <div class="card">
+        <div class="h3" style="margin-bottom:8px">Compartilhamentos</div>
+        <p class="h2" id="total-shares">0</p>
+        <p class="muted" style="font-size:13px; margin-top:4px">vezes que você propagou.</p>
+      </div>
+    </div>
+
+    <div id="ritmo-conquistas-tab" style="display:none">
+      <div id="conquistas-list"></div>
+    </div>
+
+    <div id="ritmo-ranking-tab" style="display:none">
+      <p class="muted" style="font-size:13px; margin-bottom:14px">
+        Ranking global do LEGENDIARIO por dias lidos.
+      </p>
+      <div id="ranking-list"></div>
+    </div>
+  </section>
+
+  <!-- 5. CONTA -->
+  <section class="view" id="view-conta">
+    <h2 class="h2" style="margin-bottom:6px">Conta</h2>
+    <p class="muted" style="margin-bottom:24px; font-size:14px;" id="conta-email">—</p>
+
+    <div class="card">
+      <div class="h3" style="margin-bottom:14px">Perfil</div>
+      <div class="form-row">
+        <label>Nome</label>
+        <input id="perfil-nome" placeholder="Seu nome">
+      </div>
+      <div class="form-row">
+        <label>WhatsApp (DDD + número)</label>
+        <input id="perfil-telefone" placeholder="+5511999999999" inputmode="tel">
+      </div>
+      <div class="form-row">
+        <label>Hora do WhatsApp diário</label>
+        <select id="perfil-whatsapp-hour">
+          <option value="5">5h</option>
+          <option value="6">6h</option>
+          <option value="7" selected>7h</option>
+          <option value="8">8h</option>
+          <option value="9">9h</option>
+          <option value="10">10h</option>
+          <option value="12">12h</option>
+          <option value="18">18h</option>
+          <option value="20">20h</option>
+          <option value="21">21h</option>
+          <option value="22">22h</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label>Profissão</label>
+        <input id="perfil-profissao" placeholder="O que você faz">
+      </div>
+      <div class="form-row">
+        <label>Cidade / UF</label>
+        <div style="display:flex; gap:8px;">
+          <input id="perfil-cidade" placeholder="Cidade" style="flex:2">
+          <input id="perfil-estado" placeholder="UF" maxlength="2" style="flex:1; text-transform:uppercase;">
+        </div>
+      </div>
+      <button class="btn btn-primary btn-full" id="btn-salvar-perfil">Salvar</button>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <button class="btn btn-ghost btn-full" id="btn-logout" style="color:var(--danger);">Sair</button>
+
+    <p class="tiny" style="text-align:center; margin-top:40px;">
+      LEGENDIARIO · v0.1 · staging
+    </p>
+  </section>
+
+  <!-- Tab bar -->
+  <nav class="tab-bar">
+    <button data-view="hoje" class="active">
+      <span class="tab-icon">☀</span>
+      Hoje
+    </button>
+    <button data-view="dias">
+      <span class="tab-icon">▦</span>
+      Dias
+    </button>
+    <button data-view="acoes">
+      <span class="tab-icon">◉</span>
+      Ações
+    </button>
+    <button data-view="ritmo">
+      <span class="tab-icon">▲</span>
+      Ritmo
+    </button>
+    <button data-view="conta">
+      <span class="tab-icon">●</span>
+      Conta
+    </button>
+  </nav>
+</div>
+
+<!-- Modal desbloqueio -->
+<div class="modal-backdrop" id="modal-unlock">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('modal-unlock')">×</button>
+    <div class="modal-title">Desbloquear dia perdido</div>
+    <p class="muted" style="font-size:14px; margin-bottom:18px">
+      Você pode gastar <strong style="color:var(--brand)">1 crédito</strong> pra ler essa provocação que ficou pra trás.
+      Você tem <strong style="color:var(--brand)" id="unlock-credits-n">0</strong> créditos.
+    </p>
+    <div id="unlock-dia-preview"></div>
+    <button class="btn btn-primary btn-full" id="btn-confirm-unlock" style="margin-top:16px">
+      Gastar 1 crédito
+    </button>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<!-- Supabase JS -->
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/+esm';
+
+// ============= CONFIG =============
+const SUPABASE_URL = 'https://dmgebgofjhtgunhhetee.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRtZ2ViZ29mamh0Z3VuaGhldGVlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY3NDg5NDAsImV4cCI6MjA5MjMyNDk0MH0.Th9SYHGtoyLpO1sdrZ9FKg4rrv07SJbnrssa64-0CFU';
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON, {
+  auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
+});
+
+window.supabase = supabase;
+
+// ============= STATE =============
+const STATE = {
+  user: null,
+  profile: null,
+  provocacoes: new Map(),   // key: dia_ano (MM-DD) -> row
+  autores: new Map(),       // key: slug -> row
+  readDays: new Set(),      // MM-DD
+  unlockedDays: new Set(),
+  credits: 0,
+  streak: 0,
+  bestStreak: 0,
+  shares: 0,
+  actions: [],
+  subscriptionStart: null,  // Date
+};
+
+window.STATE = STATE;
+
+// ============= UTILS =============
+const $ = sel => document.querySelector(sel);
+const $$ = sel => document.querySelectorAll(sel);
+
+function toast(msg, duration = 3000) {
+  const el = $('#toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), duration);
+}
+
+function todayMMDD() {
+  const d = new Date(Date.now() - 3 * 3600 * 1000); // UTC-3
+  return `${String(d.getUTCMonth()+1).padStart(2,'0')}-${String(d.getUTCDate()).padStart(2,'0')}`;
+}
+
+function mmddToDate(mmdd, year) {
+  const [mm, dd] = mmdd.split('-').map(Number);
+  return new Date(Date.UTC(year || new Date().getUTCFullYear(), mm-1, dd));
+}
+
+function isWithinSubscription(mmdd) {
+  if (!STATE.subscriptionStart) return true; // sem assinatura, libera tudo
+  // Assinatura começa em subscriptionStart e dura 365 dias
+  const start = STATE.subscriptionStart;
+  const today = new Date();
+  const todayMmdd = todayMMDD();
+  // Converter mmdd pro ano correto (lógica simplificada)
+  // Se dia <= hoje, é o ano atual; se não, é o ano anterior (assinatura rotaciona)
+  // Por ora: considera que subscription cobre 365 dias a partir da start date
+  const diasDesdeSub = Math.floor((today - start) / (24*3600*1000));
+  return diasDesdeSub >= 0 && diasDesdeSub <= 365;
+}
+
+function isMissedDay(mmdd) {
+  const t = todayMMDD();
+  if (mmdd >= t) return false; // hoje ou futuro
+  if (STATE.readDays.has(mmdd)) return false;
+  if (STATE.unlockedDays.has(mmdd)) return false;
+  return true;
+}
+
+function isUnlocked(mmdd) {
+  return mmdd === todayMMDD() || STATE.readDays.has(mmdd) || STATE.unlockedDays.has(mmdd);
+}
+
+function getAutor(slug) {
+  return STATE.autores.get(slug) || {
+    nome: '—', instagram: '—', numero_registro: '—', cor_hex: '#FF4D14'
+  };
+}
+
+function setAuthorColor(slug) {
+  const a = getAutor(slug);
+  document.documentElement.style.setProperty('--author-color', a.cor_hex || '#FF4D14');
+}
+
+// ============= AUTH =============
+async function sendMagicLink(email) {
+  const { error } = await supabase.auth.signInWithOtp({
+    email,
+    options: {
+      emailRedirectTo: window.location.origin + '/'
+    }
+  });
+  if (error) throw error;
+}
+
+async function logout() {
+  await supabase.auth.signOut();
+  localStorage.removeItem('STATE_CACHE');
+  location.reload();
+}
+
+// ============= DATA LOAD =============
+async function loadContent() {
+  try {
+    const [provsResp, autoresResp] = await Promise.all([
+      fetch('/api/provocacoes/full'),
+      fetch('/api/autores'),
+    ]);
+    if (!provsResp.ok || !autoresResp.ok) throw new Error('API error');
+    const provs = await provsResp.json();
+    const autores = await autoresResp.json();
+    provs.forEach(p => STATE.provocacoes.set(p.dia_ano, p));
+    autores.forEach(a => STATE.autores.set(a.slug, a));
+    return true;
+  } catch (e) {
+    console.error('loadContent error', e);
+    return false;
+  }
+}
+
+async function loadUserState() {
+  // Carrega perfil
+  const { data: profile } = await supabase
+    .from('users')
+    .select('*')
+    .eq('id', STATE.user.id)
+    .single();
+  STATE.profile = profile || null;
+  if (profile?.subscription_start) STATE.subscriptionStart = new Date(profile.subscription_start);
+
+  // Carrega reads/unlocks/actions
+  const [reads, unlocks, actions] = await Promise.all([
+    supabase.from('user_reads').select('day_id').eq('user_id', STATE.user.id),
+    supabase.from('user_unlocks').select('day_id').eq('user_id', STATE.user.id),
+    supabase.from('user_actions').select('*').eq('user_id', STATE.user.id).order('created_at', { ascending: false }),
+  ]);
+  reads.data?.forEach(r => STATE.readDays.add(r.day_id));
+  unlocks.data?.forEach(u => STATE.unlockedDays.add(u.day_id));
+  STATE.actions = actions.data || [];
+
+  computeStreak();
+}
+
+function computeStreak() {
+  // Conta streak consecutivo até hoje
+  let streak = 0;
+  let d = new Date(Date.now() - 3*3600*1000);
+  while (true) {
+    const mmdd = `${String(d.getUTCMonth()+1).padStart(2,'0')}-${String(d.getUTCDate()).padStart(2,'0')}`;
+    if (STATE.readDays.has(mmdd) || STATE.unlockedDays.has(mmdd)) {
+      streak++;
+      d.setUTCDate(d.getUTCDate() - 1);
+    } else {
+      break;
+    }
+  }
+  STATE.streak = streak;
+  STATE.bestStreak = Math.max(STATE.bestStreak, streak, STATE.readDays.size > 0 ? streak : 0);
+}
+
+// ============= MUTATIONS =============
+async function markAsRead(mmdd) {
+  const { error } = await supabase
+    .from('user_reads')
+    .insert({ user_id: STATE.user.id, day_id: mmdd });
+  if (error && !error.message.includes('duplicate')) {
+    toast('Erro ao salvar leitura');
+    console.error(error);
+    return false;
+  }
+  STATE.readDays.add(mmdd);
+  STATE.credits++;  // Ganha 1 crédito por leitura
+  computeStreak();
+  return true;
+}
+
+async function unlockDay(mmdd) {
+  if (STATE.credits < 1) { toast('Sem créditos suficientes'); return false; }
+  const { error } = await supabase
+    .from('user_unlocks')
+    .insert({ user_id: STATE.user.id, day_id: mmdd });
+  if (error) { toast('Erro no desbloqueio'); console.error(error); return false; }
+  STATE.unlockedDays.add(mmdd);
+  STATE.credits--;
+  return true;
+}
+
+async function createAction(title, reminderDate) {
+  const row = {
+    user_id: STATE.user.id,
+    day_id: todayMMDD(),
+    title,
+    status: 'pending',
+    reminder_date: reminderDate || null,
+  };
+  const { data, error } = await supabase
+    .from('user_actions')
+    .insert(row)
+    .select()
+    .single();
+  if (error) { toast('Erro ao criar ação'); console.error(error); return null; }
+  STATE.actions.unshift(data);
+  return data;
+}
+
+async function toggleAction(id) {
+  const action = STATE.actions.find(a => a.id === id);
+  if (!action) return;
+  const newStatus = action.status === 'done' ? 'pending' : 'done';
+  const { error } = await supabase
+    .from('user_actions')
+    .update({
+      status: newStatus,
+      completed_at: newStatus === 'done' ? new Date().toISOString() : null,
+    })
+    .eq('id', id);
+  if (error) { toast('Erro'); return; }
+  action.status = newStatus;
+  action.completed_at = newStatus === 'done' ? new Date().toISOString() : null;
+}
+
+async function saveProfile(patch) {
+  // Upsert perfil
+  const row = {
+    id: STATE.user.id,
+    email: STATE.user.email,
+    ...patch,
+    updated_at: new Date().toISOString(),
+  };
+  const { error } = await supabase
+    .from('users')
+    .upsert(row);
+  if (error) { toast('Erro ao salvar perfil'); console.error(error); return false; }
+  STATE.profile = { ...STATE.profile, ...patch };
+  toast('Perfil salvo');
+  return true;
+}
+
+// ============= RENDER =============
+function renderHoje() {
+  const mmdd = todayMMDD();
+  const p = STATE.provocacoes.get(mmdd);
+  if (!p) {
+    $('#hoje-citacao').textContent = 'Sem provocação pra hoje ainda.';
+    $('#hoje-pergunta').textContent = '';
+    $('#hoje-texto').textContent = 'Verifique a configuração do banco de dados.';
+    return;
+  }
+  setAuthorColor(p.autor_slug);
+  const autor = getAutor(p.autor_slug);
+
+  const now = new Date();
+  const dayOfYear = Math.floor((now - new Date(now.getFullYear(), 0, 0)) / 86400000);
+
+  $('#hoje-date').textContent = now.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
+  $('#hoje-dia-n').textContent = `DIA ${dayOfYear}/365`;
+  $('#hoje-citacao').textContent = `"${p.citacao}"`;
+  $('#hoje-citacao-ref').textContent = p.autor_citacao || '';
+  $('#hoje-pergunta').textContent = p.pergunta;
+  $('#hoje-texto').textContent = p.texto;
+  $('#hoje-aspas').textContent = `"${p.aspas_autor}"`;
+  $('#hoje-autor-nome').textContent = autor.nome;
+  $('#hoje-autor-num').textContent = `Nº ${autor.numero_registro}`;
+
+  // Ler mais
+  const texto = $('#hoje-texto');
+  const lerMais = $('#hoje-ler-mais');
+  if (p.texto.length > 400) {
+    texto.classList.add('texto-collapsed');
+    lerMais.style.display = 'block';
+    lerMais.textContent = 'LER MAIS ↓';
+    lerMais.onclick = () => {
+      const expanded = !texto.classList.contains('texto-collapsed');
+      if (expanded) {
+        texto.classList.add('texto-collapsed');
+        lerMais.textContent = 'LER MAIS ↓';
+      } else {
+        texto.classList.remove('texto-collapsed');
+        lerMais.textContent = 'LER MENOS ↑';
+      }
+    };
+  } else {
+    texto.classList.remove('texto-collapsed');
+    lerMais.style.display = 'none';
+  }
+
+  // Botão lido
+  const btn = $('#btn-lido');
+  if (STATE.readDays.has(mmdd)) {
+    btn.textContent = '✓ LIDO HOJE';
+    btn.classList.add('already-read');
+    btn.disabled = true;
+  } else {
+    btn.textContent = 'MARCAR COMO LIDO';
+    btn.classList.remove('already-read');
+    btn.disabled = false;
+  }
+
+  renderCredits();
+}
+
+function renderCredits() {
+  $('#credits-n').textContent = STATE.credits;
+}
+
+function renderDias() {
+  const container = $('#meses-container');
+  container.innerHTML = '';
+  const meses = ['JANEIRO','FEVEREIRO','MARÇO','ABRIL','MAIO','JUNHO','JULHO','AGOSTO','SETEMBRO','OUTUBRO','NOVEMBRO','DEZEMBRO'];
+  const year = new Date().getUTCFullYear();
+  const today = todayMMDD();
+
+  let totalLidos = 0, totalPerdidos = 0;
+
+  for (let m = 1; m <= 12; m++) {
+    const block = document.createElement('div');
+    block.className = 'mes-block';
+    const daysInMonth = new Date(year, m, 0).getDate();
+
+    let lidosNoMes = 0;
+
+    const gridHtml = [];
+    for (let d = 1; d <= daysInMonth; d++) {
+      const mmdd = `${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+      let cls = 'dia-cell';
+      if (mmdd === today) cls += ' dia-hoje';
+      else if (STATE.readDays.has(mmdd)) { cls += ' dia-lido'; lidosNoMes++; totalLidos++; }
+      else if (STATE.unlockedDays.has(mmdd)) { cls += ' dia-desbloqueado'; lidosNoMes++; totalLidos++; }
+      else if (mmdd < today && isWithinSubscription(mmdd)) { cls += ' dia-perdido'; totalPerdidos++; }
+      else if (mmdd > today) cls += ' dia-futuro';
+      gridHtml.push(`<div class="${cls}" data-mmdd="${mmdd}">${d}</div>`);
+    }
+
+    block.innerHTML = `
+      <div class="mes-titulo">
+        <span>${meses[m-1]}</span>
+        <span class="mes-stats">${lidosNoMes}/${daysInMonth}</span>
+      </div>
+      <div class="dias-grid">${gridHtml.join('')}</div>
+    `;
+    container.appendChild(block);
+  }
+
+  $('#dias-resumo').innerHTML = `<strong style="color:var(--text)">${totalLidos}</strong> lidos · <strong style="color:var(--danger)">${totalPerdidos}</strong> perdidos`;
+
+  // Delegation: clicar em dia perdido abre modal de unlock
+  container.addEventListener('click', (e) => {
+    const cell = e.target.closest('.dia-cell.dia-perdido');
+    if (!cell) return;
+    const mmdd = cell.dataset.mmdd;
+    showUnlockModal(mmdd);
+  });
+}
+
+function showUnlockModal(mmdd) {
+  const p = STATE.provocacoes.get(mmdd);
+  if (!p) { toast('Provocação não encontrada'); return; }
+  const autor = getAutor(p.autor_slug);
+  $('#unlock-credits-n').textContent = STATE.credits;
+  $('#unlock-dia-preview').innerHTML = `
+    <div style="padding:14px; background:var(--bg-card-2); border-radius:8px; margin-top:14px;">
+      <div style="font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:2px; margin-bottom:6px;">Dia ${mmdd}</div>
+      <div style="font-family:'Fraunces'; font-style:italic; font-size:15px; line-height:1.4; margin-bottom:10px;">"${p.citacao}"</div>
+      <div style="font-size:13px; color:var(--text-dim);">— ${autor.nome} · Nº ${autor.numero_registro}</div>
+    </div>
+  `;
+  $('#btn-confirm-unlock').onclick = async () => {
+    const ok = await unlockDay(mmdd);
+    if (ok) {
+      closeModal('modal-unlock');
+      toast('Dia desbloqueado');
+      renderDias();
+      renderCredits();
+    }
+  };
+  $('#btn-confirm-unlock').disabled = STATE.credits < 1;
+  openModal('modal-unlock');
+}
+
+function renderAcoes() {
+  const pendentes = STATE.actions.filter(a => a.status === 'pending' && !a.reminder_date);
+  const lembretes = STATE.actions.filter(a => a.reminder_date);
+  const feitas = STATE.actions.filter(a => a.status === 'done');
+
+  const renderList = (list, emptyMsg) => {
+    if (!list.length) return `<p class="muted" style="font-size:14px; padding:20px 0;">${emptyMsg}</p>`;
+    return list.map(a => `
+      <div class="action-item">
+        <div class="check ${a.status === 'done' ? 'done' : ''}" data-toggle-id="${a.id}">
+          ${a.status === 'done' ? '✓' : ''}
+        </div>
+        <div class="action-body">
+          <div class="action-title ${a.status === 'done' ? 'done' : ''}">${escapeHtml(a.title)}</div>
+          <div class="action-meta">
+            ${a.reminder_date ? '📅 ' + a.reminder_date : 'Criada em ' + new Date(a.created_at).toLocaleDateString('pt-BR')}
+          </div>
+        </div>
+      </div>
+    `).join('');
+  };
+
+  $('#acoes-pendentes-list').innerHTML = renderList(pendentes, 'Nenhuma ação pendente. Crie uma a partir de uma provocação ou aqui acima.');
+  $('#acoes-lembretes-list').innerHTML = renderList(lembretes, 'Nenhum lembrete agendado.');
+  $('#acoes-feitas-list').innerHTML = renderList(feitas, 'Nenhuma ação concluída ainda.');
+
+  // Toggle handlers
+  $$('.check[data-toggle-id]').forEach(el => {
+    el.onclick = async () => {
+      await toggleAction(el.dataset.toggleId);
+      renderAcoes();
+      renderRitmo();
+    };
+  });
+}
+
+function renderRitmo() {
+  $('#kpi-streak').textContent = STATE.streak;
+  $('#kpi-best').textContent = STATE.bestStreak;
+  $('#kpi-total').textContent = STATE.readDays.size + STATE.unlockedDays.size;
+
+  const cicloDia = STATE.streak % 30;
+  $('#ciclo-dia').textContent = cicloDia;
+  $('#ciclo-fill').style.width = `${(cicloDia/30)*100}%`;
+  $('#total-shares').textContent = STATE.shares;
+
+  // Conquistas
+  const totalLidos = STATE.readDays.size + STATE.unlockedDays.size;
+  const conquistas = [
+    { id: 'primeira',    nome: 'Primeira provocação',    desc: 'Leu pelo menos 1 dia',      unlock: totalLidos >= 1,   icon: '1' },
+    { id: 'ofensiva7',   nome: 'Ofensiva 7 dias',        desc: 'Streak de 7 dias consecutivos', unlock: STATE.streak >= 7 || STATE.bestStreak >= 7, icon: '7' },
+    { id: 'ofensiva21',  nome: 'Ofensiva 21 dias',       desc: 'Streak de 21 dias',          unlock: STATE.streak >= 21 || STATE.bestStreak >= 21, icon: '21' },
+    { id: 'ciclo',       nome: 'Ciclo completo',         desc: '30 dias consecutivos',       unlock: STATE.streak >= 30 || STATE.bestStreak >= 30, icon: '30' },
+    { id: 'metade',      nome: 'Meio do caminho',        desc: '180 dias lidos (qualquer)',  unlock: totalLidos >= 180, icon: '½' },
+    { id: 'legendario',  nome: 'LEGENDÁRIO',             desc: '365 dias completos',         unlock: totalLidos >= 365, icon: '★' },
+    { id: 'share10',     nome: 'Propagador',             desc: 'Compartilhou 10 vezes',      unlock: STATE.shares >= 10, icon: '↗' },
+    { id: 'acao10',      nome: 'Executor',               desc: 'Concluiu 10 ações',          unlock: STATE.actions.filter(a=>a.status==='done').length >= 10, icon: '◉' },
+  ];
+  $('#conquistas-list').innerHTML = conquistas.map(c => `
+    <div class="badge ${c.unlock ? '' : 'locked'}">
+      <div class="badge-icon" style="background:${c.unlock ? 'var(--brand)' : 'var(--text-muted)'}">${c.icon}</div>
+      <div>
+        <div class="badge-title">${c.nome}</div>
+        <div class="badge-desc">${c.desc}</div>
+      </div>
+    </div>
+  `).join('');
+
+  // Ranking placeholder (implementar com endpoint dedicado depois)
+  $('#ranking-list').innerHTML = `
+    <div class="rank-item me">
+      <div class="rank-pos">—</div>
+      <div class="rank-name">Você</div>
+      <div class="rank-val">${totalLidos} dias</div>
+    </div>
+    <p class="muted" style="font-size:12px; text-align:center; margin-top:20px;">
+      Ranking global ativa em produção. Em staging, só você aparece.
+    </p>
+  `;
+}
+
+function renderConta() {
+  $('#conta-email').textContent = STATE.user?.email || '—';
+  const p = STATE.profile || {};
+  $('#perfil-nome').value = p.nome || '';
+  $('#perfil-telefone').value = p.telefone || '';
+  $('#perfil-whatsapp-hour').value = p.whatsapp_hour || 7;
+  $('#perfil-profissao').value = p.profissao || '';
+  $('#perfil-cidade').value = p.cidade || '';
+  $('#perfil-estado').value = p.estado || '';
+}
+
+function escapeHtml(s) {
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+// ============= MODALS =============
+function openModal(id) { $('#' + id).classList.add('active'); }
+function closeModal(id) { $('#' + id).classList.remove('active'); }
+window.closeModal = closeModal;
+
+// ============= NAVIGATION =============
+function switchView(name) {
+  $$('.view').forEach(v => v.classList.remove('active'));
+  $(`#view-${name}`)?.classList.add('active');
+  $$('.tab-bar button').forEach(b => b.classList.toggle('active', b.dataset.view === name));
+
+  if (name === 'hoje') renderHoje();
+  if (name === 'dias') renderDias();
+  if (name === 'acoes') renderAcoes();
+  if (name === 'ritmo') renderRitmo();
+  if (name === 'conta') renderConta();
+}
+
+// ============= EVENT HANDLERS =============
+function bindEvents() {
+  // Tab bar
+  $$('.tab-bar button').forEach(b => {
+    b.onclick = () => switchView(b.dataset.view);
+  });
+
+  // HOJE: marcar lido
+  $('#btn-lido').onclick = async () => {
+    const ok = await markAsRead(todayMMDD());
+    if (ok) {
+      toast('Provocação marcada como lida');
+      renderHoje();
+      renderCredits();
+    }
+  };
+
+  // Compartilhamento WA
+  $('#btn-share-wa').onclick = () => {
+    const mmdd = todayMMDD();
+    const p = STATE.provocacoes.get(mmdd);
+    if (!p) return;
+    const autor = getAutor(p.autor_slug);
+    const txt = `*LEGENDIARIO* — Dia de hoje\n\n_"${p.citacao}"_\n*— ${p.autor_citacao}*\n\n*${p.pergunta}*\n\n${p.texto.slice(0, 240)}${p.texto.length > 240 ? '…' : ''}\n\n— ${autor.nome}, Nº ${autor.numero_registro}\n${autor.instagram}\n\nlegendiario.com`;
+    window.open(`https://wa.me/?text=${encodeURIComponent(txt)}`, '_blank');
+    STATE.shares++;
+  };
+
+  // Stories (placeholder — implementar canvas depois)
+  $('#btn-share-story').onclick = () => {
+    toast('Export Stories em desenvolvimento');
+  };
+
+  // Criar ação a partir de hoje
+  $('#btn-criar-acao').onclick = () => {
+    switchView('acoes');
+    setTimeout(() => $('#new-action-input').focus(), 200);
+  };
+
+  // LOGIN
+  $('#login-form').onsubmit = async (e) => {
+    e.preventDefault();
+    const email = $('#login-email').value.trim();
+    if (!email) return;
+    const btn = $('#login-submit');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span>';
+    const msg = $('#login-msg');
+    msg.className = 'login-msg';
+    try {
+      await sendMagicLink(email);
+      msg.className = 'login-msg ok';
+      msg.textContent = 'Link enviado. Confere teu email (pode tá no spam).';
+    } catch (err) {
+      msg.className = 'login-msg err';
+      msg.textContent = err.message || 'Erro ao enviar';
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Enviar link de acesso';
+    }
+  };
+
+  // LOGOUT
+  $('#btn-logout').onclick = () => {
+    if (confirm('Sair?')) logout();
+  };
+
+  // SALVAR PERFIL
+  $('#btn-salvar-perfil').onclick = async () => {
+    const btn = $('#btn-salvar-perfil');
+    btn.disabled = true;
+    btn.textContent = 'Salvando...';
+    await saveProfile({
+      nome: $('#perfil-nome').value.trim(),
+      telefone: $('#perfil-telefone').value.trim(),
+      whatsapp_hour: parseInt($('#perfil-whatsapp-hour').value),
+      profissao: $('#perfil-profissao').value.trim(),
+      cidade: $('#perfil-cidade').value.trim(),
+      estado: $('#perfil-estado').value.trim().toUpperCase(),
+      perfil_completo: true,
+    });
+    btn.disabled = false;
+    btn.textContent = 'Salvar';
+  };
+
+  // AÇÕES
+  $('#new-action-btn').onclick = async () => {
+    const t = $('#new-action-input').value.trim();
+    if (!t) return;
+    const a = await createAction(t);
+    if (a) {
+      $('#new-action-input').value = '';
+      renderAcoes();
+    }
+  };
+  $('#new-action-input').onkeydown = (e) => { if (e.key === 'Enter') $('#new-action-btn').click(); };
+
+  $('#new-reminder-btn').onclick = async () => {
+    const t = $('#new-reminder-input').value.trim();
+    const d = $('#new-reminder-date').value;
+    if (!t || !d) { toast('Preencha texto e data'); return; }
+    const a = await createAction(t, d);
+    if (a) {
+      $('#new-reminder-input').value = '';
+      $('#new-reminder-date').value = '';
+      renderAcoes();
+    }
+  };
+
+  // Sub-tabs AÇÕES
+  $$('[data-tab-acoes]').forEach(b => {
+    b.onclick = () => {
+      $$('[data-tab-acoes]').forEach(x => x.classList.remove('active'));
+      b.classList.add('active');
+      ['pendentes','lembretes','feitas'].forEach(name => {
+        $(`#acoes-${name}-tab`).style.display = name === b.dataset.tabAcoes ? 'block' : 'none';
+      });
+    };
+  });
+
+  // Sub-tabs RITMO
+  $$('[data-tab-ritmo]').forEach(b => {
+    b.onclick = () => {
+      $$('[data-tab-ritmo]').forEach(x => x.classList.remove('active'));
+      b.classList.add('active');
+      ['meu','conquistas','ranking'].forEach(name => {
+        $(`#ritmo-${name}-tab`).style.display = name === b.dataset.tabRitmo ? 'block' : 'none';
+      });
+    };
+  });
+}
+
+// ============= INIT =============
+async function init() {
+  // Service worker
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js').catch(e => console.warn('SW:', e));
+  }
+
+  bindEvents();
+
+  // Check session
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) {
+    // Login view
+    $('#loading').classList.add('hidden');
+    $('#login-view').classList.add('active');
+    return;
+  }
+
+  STATE.user = session.user;
+
+  // Escutar mudanças de sessão
+  supabase.auth.onAuthStateChange((evt, sess) => {
+    if (!sess && STATE.user) location.reload();
+  });
+
+  // Carrega conteúdo + estado
+  const contentOk = await loadContent();
+  if (!contentOk) {
+    $('#loading').innerHTML = `
+      <img src="https://res.cloudinary.com/dlzrfhwin/image/upload/v1776770398/legendiario-mark-orange_kex0ij.png" class="brand-mark" style="width:180px; opacity:0.5">
+      <p style="color:var(--text-dim); text-align:center; padding:0 30px;">
+        Erro ao carregar conteúdo.<br>Verifique o DB no Supabase.
+      </p>
+      <button class="btn btn-secondary" onclick="location.reload()">Recarregar</button>
+    `;
+    return;
+  }
+  await loadUserState();
+
+  $('#loading').classList.add('hidden');
+  $('#app').style.display = 'block';
+  switchView('hoje');
+}
+
+init().catch(e => {
+  console.error('init error', e);
+  $('#loading').innerHTML = `
+    <p style="color:var(--danger); padding:20px; text-align:center;">Erro na inicialização.<br><small>${e.message}</small></p>
+    <button class="btn btn-secondary" onclick="location.reload()">Recarregar</button>
+  `;
+});
 </script>
 
 </body>
