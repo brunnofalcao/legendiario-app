@@ -27,23 +27,113 @@ app.use(express.json({ limit: '2mb' }));
 app.use(express.static('public'));
 
 // --- Supabase (service role: só no backend) ---
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY
-);
+let supabase = null;
+try {
+  if (process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    supabase = createClient(
+      process.env.SUPABASE_URL,
+      process.env.SUPABASE_SERVICE_ROLE_KEY
+    );
+    console.log('[supabase] Cliente criado com sucesso');
+  } else {
+    console.warn('[supabase] URL/SERVICE_ROLE_KEY ausentes — endpoints DB vão falhar');
+  }
+} catch (e) {
+  console.error('[supabase] Erro criando cliente:', e.message);
+}
+
+// =============================================
+// HEALTH CHECK
+// =============================================
+
+app.get('/api/health', async (req, res) => {
+  const health = {
+    ok: true,
+    service: 'LEGENDIARIO',
+    version: '0.1.0',
+    env: process.env.NODE_ENV || 'unknown',
+    timestamp: new Date().toISOString(),
+    uptime_seconds: Math.round(process.uptime()),
+    checks: {
+      supabase_configured: !!(process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY),
+      whatsapp_configured: !!(process.env.WA_TOKEN && process.env.WA_PHONE_NUMBER_ID),
+      cloudinary_configured: !!process.env.CLOUDINARY_CLOUD_NAME,
+      admin_key_set: !!process.env.ADMIN_KEY,
+    }
+  };
+
+  // Tenta ping no Supabase se configurado
+  if (supabase) {
+    try {
+      const { error } = await supabase.from('autores').select('id', { count: 'exact', head: true });
+      health.checks.supabase_db_reachable = !error;
+      if (error) health.checks.supabase_error = error.message;
+    } catch (e) {
+      health.checks.supabase_db_reachable = false;
+      health.checks.supabase_error = e.message;
+    }
+  }
+
+  res.json(health);
+});
 
 // =============================================
 // ENDPOINTS DE CONTEÚDO
 // =============================================
 
-// GET /api/provocacoes/full — retorna TODAS as provocações (Supabase source of truth)
+// GET /api/autores — lista dos 10 autores fictícios
+app.get('/api/autores', async (req, res) => {
+  if (!supabase) return res.status(503).json({ error: 'database not configured' });
+  const { data, error } = await supabase
+    .from('autores')
+    .select('slug, nome, numero_registro, instagram, arquetipo, cor_hex, bio_curta')
+    .eq('ativo', true)
+    .order('numero_registro', { ascending: true });
+  if (error) return res.status(500).json({ error: error.message });
+  res.json(data);
+});
+
+// GET /api/provocacoes/full — retorna TODAS as provocações (source of truth)
 app.get('/api/provocacoes/full', async (req, res) => {
+  if (!supabase) return res.status(503).json({ error: 'database not configured' });
   const { data, error } = await supabase
     .from('provocacoes')
     .select('*')
     .order('mes', { ascending: true })
     .order('dia', { ascending: true });
   if (error) return res.status(500).json({ error: error.message });
+  res.json(data);
+});
+
+// GET /api/provocacao/:dia_ano — retorna uma provocação específica (ex: /api/provocacao/01-15)
+app.get('/api/provocacao/:dia_ano', async (req, res) => {
+  if (!supabase) return res.status(503).json({ error: 'database not configured' });
+  const { dia_ano } = req.params;
+  if (!/^\d{2}-\d{2}$/.test(dia_ano)) {
+    return res.status(400).json({ error: 'formato inválido, esperado MM-DD (ex: 01-15)' });
+  }
+  const { data, error } = await supabase
+    .from('provocacoes')
+    .select('*')
+    .eq('dia_ano', dia_ano)
+    .single();
+  if (error) return res.status(404).json({ error: 'provocação não encontrada', dia_ano });
+  res.json(data);
+});
+
+// GET /api/provocacao/hoje — atalho para a provocação do dia corrente (timezone BR)
+app.get('/api/hoje', async (req, res) => {
+  if (!supabase) return res.status(503).json({ error: 'database not configured' });
+  const now = new Date(Date.now() - 3 * 60 * 60 * 1000); // America/Sao_Paulo = UTC-3
+  const mm = String(now.getUTCMonth() + 1).padStart(2, '0');
+  const dd = String(now.getUTCDate()).padStart(2, '0');
+  const dia_ano = `${mm}-${dd}`;
+  const { data, error } = await supabase
+    .from('provocacoes')
+    .select('*')
+    .eq('dia_ano', dia_ano)
+    .single();
+  if (error) return res.status(404).json({ error: 'provocação de hoje não encontrada', dia_ano });
   res.json(data);
 });
 
@@ -119,10 +209,26 @@ async function sendTemplate(to, templateName, params) {
 }
 
 // =============================================
+// SPA FALLBACK (404 → index.html, pro PWA não quebrar em refresh)
+// =============================================
+
+app.get('*', (req, res) => {
+  // Só retorna index.html pra rotas não-API. Rotas /api/* não caem aqui (caíram antes).
+  if (req.path.startsWith('/api/') || req.path.startsWith('/webhook/')) {
+    return res.status(404).json({ error: 'endpoint não implementado', path: req.path });
+  }
+  res.sendFile('index.html', { root: 'public' });
+});
+
+// =============================================
 // START
 // =============================================
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`[${process.env.NODE_ENV}] LEGENDIARIO server on :${PORT}`);
+  console.log(`[${process.env.NODE_ENV || 'dev'}] LEGENDIARIO server on :${PORT}`);
+  console.log(`  health: /api/health`);
+  console.log(`  autores: /api/autores`);
+  console.log(`  hoje: /api/hoje`);
+  console.log(`  provocacao: /api/provocacao/:dia_ano`);
 });
