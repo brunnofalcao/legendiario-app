@@ -1,0 +1,129 @@
+{
+  "_comentario": "LEGENDIARIO — 9 templates UTILITY prontos para submissão no Meta Business Suite. Substitua LEGENDIARIO antes de enviar.",
+  "_api_endpoint": "https://graph.facebook.com/v22.0/{WABA_ID}/message_templates",
+  "_method": "POST",
+  "_auth": "Bearer {WA_TOKEN}",
+  "templates": [
+    {
+      "name": "util_ritmo_dia7",
+      "category": "UTILITY",
+      "language": "pt_BR",
+      "components": [
+        {
+          "type": "BODY",
+          "text": "{{1}}, você completou 7 dias do seu ciclo atual no LEGENDIARIO.\n\nSua sequência de presença segue ativa.",
+          "example": { "body_text": [["Amanda"]] }
+        }
+      ]
+    },
+    {
+      "name": "util_ritmo_dia21",
+      "category": "UTILITY",
+      "language": "pt_BR",
+      "components": [
+        {
+          "type": "BODY",
+          "text": "{{1}}, você completou 21 dias do seu ciclo atual no LEGENDIARIO.\n\nFaltam 9 dias para o encerramento do ciclo.",
+          "example": { "body_text": [["Amanda"]] }
+        }
+      ]
+    },
+    {
+      "name": "util_conquista_ofensiva",
+      "category": "UTILITY",
+      "language": "pt_BR",
+      "components": [
+        {
+          "type": "BODY",
+          "text": "{{1}}, uma nova conquista foi registrada na sua conta: *Ofensiva*.\n\nReferente à sua sequência de dias consecutivos no LEGENDIARIO.",
+          "example": { "body_text": [["Amanda"]] }
+        }
+      ]
+    },
+    {
+      "name": "util_conquista_share",
+      "category": "UTILITY",
+      "language": "pt_BR",
+      "components": [
+        {
+          "type": "BODY",
+          "text": "{{1}}, uma nova conquista foi registrada na sua conta: *Share*.\n\nReferente aos seus compartilhamentos de provocações no LEGENDIARIO.",
+          "example": { "body_text": [["Amanda"]] }
+        }
+      ]
+    },
+    {
+      "name": "util_conquista_acao",
+      "category": "UTILITY",
+      "language": "pt_BR",
+      "components": [
+        {
+          "type": "BODY",
+          "text": "{{1}}, uma nova conquista foi registrada na sua conta: *Ação*.\n\nReferente às ações concluídas a partir das suas provocações.",
+          "example": { "body_text": [["Amanda"]] }
+        }
+      ]
+    },
+    {
+      "name": "util_conquista_ciclo",
+      "category": "UTILITY",
+      "language": "pt_BR",
+      "components": [
+        {
+          "type": "BODY",
+          "text": "{{1}}, um Ciclo foi concluído na sua conta do LEGENDIARIO.\n\nVocê completou os 30 dias do ciclo atual.",
+          "example": { "body_text": [["Amanda"]] }
+        }
+      ]
+    },
+    {
+      "name": "util_ranking_top10_entrou",
+      "category": "UTILITY",
+      "language": "pt_BR",
+      "components": [
+        {
+          "type": "BODY",
+          "text": "{{1}}, sua posição no ranking do LEGENDIARIO foi atualizada.\n\nVocê agora está no *Top 10*.",
+          "example": { "body_text": [["Amanda"]] }
+        }
+      ]
+    },
+    {
+      "name": "util_ranking_top3_entrou",
+      "category": "UTILITY",
+      "language": "pt_BR",
+      "components": [
+        {
+          "type": "BODY",
+          "text": "{{1}}, sua posição no ranking do LEGENDIARIO foi atualizada.\n\nVocê agora está no *Top 3*.",
+          "example": { "body_text": [["Amanda"]] }
+        }
+      ]
+    },
+    {
+      "name": "util_ranking_top3_saiu",
+      "category": "UTILITY",
+      "language": "pt_BR",
+      "components": [
+        {
+          "type": "BODY",
+          "text": "{{1}}, sua posição no ranking do LEGENDIARIO foi atualizada.\n\nVocê não está mais no Top 3.",
+          "example": { "body_text": [["Amanda"]] }
+        }
+      ]
+    }
+  ],
+  "template_marketing_opcional": {
+    "name": "legendiario_conteudo_disponivel",
+    "category": "MARKETING",
+    "language": "pt_BR",
+    "_nota": "Templates MARKETING só entregam APÓS primeira interação do usuário (erro Meta 131049). Use este apenas em fluxo com opt-in prévio.",
+    "components": [
+      {
+        "type": "BODY",
+        "text": "{{1}}, seu conteúdo de hoje no LEGENDIARIO está disponível.\n\n{{2}}",
+        "example": { "body_text": [["Amanda", "Provocação do dia 5: O que você está disposto a começar hoje que ontem você adiou?"]] }
+      }
+    ]
+  }
+}

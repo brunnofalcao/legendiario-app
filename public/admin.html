@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LEGENDIARIO — Admin</title>
+  <style>
+    :root { --brand: #FF4D14; --gold: #0A0A0A; }
+    /* Design-responsive (desktop + mobile). Ver Manual Técnico seção 7 */
+  </style>
+</head>
+<body>
+<!--
+  ABAS DO ADMIN (proteger com ADMIN_KEY via prompt no load):
+    1. Content      — editar provocações dia a dia (upsert em Supabase)
+    2. Users        — listar, filtrar por estado/profissão/plano, exportar CSV
+    3. WhatsApp     — testar envio, submeter templates, ver logs (status delivery)
+    4. Demographics — gráficos de distribuição (Chart.js ou Recharts)
+    5. Financial    — receita, churn, LTV, conversão Hotmart
+    6. Hooked       — retenção por coorte (Heatmap D1-D30-D60-D90)
+    7. Investor     — KPIs macro (MAU, DAU, ARPU, streak médio, etc.)
+-->
+<div id="login-gate">
+  <input type="password" placeholder="Admin key" id="admin-key">
+  <button onclick="unlock()">Entrar</button>
+</div>
+<div id="dashboard" style="display:none">
+  <!-- 7 abas + charts -->
+</div>
+<script>
+  async function apiCall(path, opts = {}) {
+    return fetch(path, { ...opts, headers: { ...opts.headers, 'X-Admin-Key': localStorage.getItem('admin_key') }});
+  }
+</script>
+</body>
+</html>

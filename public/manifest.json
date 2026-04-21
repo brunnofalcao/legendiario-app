@@ -1,0 +1,35 @@
+{
+  "name": "LEGENDIARIO",
+  "short_name": "LEGENDIARIO",
+  "description": "365 dias de confronto, fé e posicionamento",
+  "id": "/",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#FF4D14",
+  "theme_color": "#FF4D14",
+  "lang": "pt-BR",
+  "dir": "ltr",
+  "scope": "/",
+  "categories": ["lifestyle", "health", "education", "productivity"],
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-maskable-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "screenshots": [
+    { "src": "screenshots/screenshot-1.png", "sizes": "540x720", "type": "image/png", "form_factor": "narrow" },
+    { "src": "screenshots/screenshot-wide.png", "sizes": "1280x720", "type": "image/png", "form_factor": "wide" }
+  ],
+  "shortcuts": [
+    { "name": "Hoje", "short_name": "Hoje", "description": "Ver provocação do dia", "url": "/?view=hoje", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Dias", "short_name": "Dias", "description": "Calendário", "url": "/?view=dias", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] }
+  ],
+  "share_target": {
+    "action": "/share",
+    "method": "GET",
+    "params": { "title": "title", "text": "text", "url": "url" }
+  },
+  "prefer_related_applications": false
+}

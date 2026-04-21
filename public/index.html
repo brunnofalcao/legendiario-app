@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#FF4D14">
+  <title>LEGENDIARIO</title>
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" href="/icons/icon-192.png">
+
+  <!-- Meta Pixel -->
+  <script>/* Meta Pixel PIXEL_ID_PLACEHOLDER */</script>
+  <!-- GA4 -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=[GA4_ID]"></script>
+
+  <style>
+    :root {
+      --brand-primary: #FF4D14;
+      --brand-secondary: #0A0A0A;
+      --author-1: [COR_AUTOR_1];
+      --author-2: [COR_AUTOR_2];
+      --bg: #FAFAFA;
+      --text: #1A1A1A;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, sans-serif; background: var(--bg); color: var(--text); }
+
+    /* Bloqueio de landscape em mobile */
+    @media screen and (orientation: landscape) and (max-width: 900px) {
+      #landscape-overlay { display: flex; }
+      #app-root { display: none; }
+    }
+    #landscape-overlay { display: none; position: fixed; inset: 0; background: var(--brand-primary);
+      color: white; justify-content: center; align-items: center; z-index: 9999; text-align: center; padding: 2rem; }
+
+    /* Tab bar bottom */
+    .tab-bar { position: fixed; bottom: 0; left: 0; right: 0; display: flex; background: white;
+      border-top: 1px solid #eee; padding: 0.5rem 0; }
+    .tab-bar button { flex: 1; background: none; border: none; font-size: 0.75rem; color: #888; }
+    .tab-bar button.active { color: var(--brand-primary); }
+  </style>
+</head>
+<body>
+
+<div id="landscape-overlay">
+  <div>
+    <h1>LEGENDIARIO</h1>
+    <p>Gire o aparelho para a posição vertical.</p>
+  </div>
+</div>
+
+<div id="app-root">
+  <!--
+    IMPLEMENTAR 5 TELAS (conforme Manual Técnico seção 5):
+      1. HOJE — provocação do dia, toggle lido, botão compartilhar WA/Stories, "Ler mais..."
+      2. DIAS — calendário 12 meses, bolinhas teal/vermelha, desbloqueio com crédito
+      3. AÇÕES — listar compromissos, toggle done/pending, aba lembretes com date picker
+      4. RITMO — 3 abas: Meu Ritmo (streak + ciclo), Conquistas (badges), Ranking (Top 10 absoluto, depois percentil)
+      5. CONTA — editar perfil, whatsapp_hour, profissão, estado, cidade, logout
+  -->
+</div>
+
+<nav class="tab-bar">
+  <button data-view="hoje" class="active">Hoje</button>
+  <button data-view="dias">Dias</button>
+  <button data-view="acoes">Ações</button>
+  <button data-view="ritmo">Ritmo</button>
+  <button data-view="conta">Conta</button>
+</nav>
+
+<script>
+  // Inicialização: checar sessão Supabase Auth, carregar /api/state, /api/provocacoes/full
+  // Renderizar tela ativa. Service Worker register.
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js');
+
+  // Lógica de estado (STATE) — ver Manual Técnico seção 5:
+  //   subscriptionStart, readDays (Set), unlockedDays (Set), credits, streak, bestStreak, shares, tasks
+  //
+  // Funções-chave:
+  //   isUnlocked(id)          — dia atual OU lido OU desbloqueado
+  //   isWithinSubscription(id) — dia entre subscriptionStart e hoje
+  //   isMissedDay(id)          — dentro da assinatura + passado + não lido
+  //   useCredit()              — gasta 1 crédito, adiciona em unlockedDays
+  //   authorDisplay(autor)     — retorna cor por autor (teal/gold)
+</script>
+
+</body>
+</html>
