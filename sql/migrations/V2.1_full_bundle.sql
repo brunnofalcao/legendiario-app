@@ -1,15 +1,20 @@
 -- =====================================================================
--- LEGENDIARIO — MIGRAÇÃO V2.1 (FINAL)
+-- LEGENDIARIO — MIGRAÇÃO V2.2 (FIX: seed autores estava vazio)
 --
 -- Projeto Supabase: dmgebgofjhtgunhhetee
 -- Link: https://supabase.com/dashboard/project/dmgebgofjhtgunhhetee/sql/new
 --
 -- ⚠️ DESTRUTIVO: APAGA e RECRIA tabelas.
 --
--- V2.1 inclui:
---   - RLS policies INSERT/SELECT/UPDATE/DELETE explícitas
---   - Policy leitura pública em autores
---   - Trigger auto-create public.users quando auth.users cria (magic link)
+-- V2.2 fix:
+--   Bug anterior (V2.1): header do arquivo 03_seed_provocacoes.sql mencionava
+--   "-- PARTE B" dentro do comentário de overview (linha 4), e meu script de
+--   geração splitava nessa string cortando ANTES dos INSERTs de autores.
+--   Resultado: seed autores vazio → FK violation no INSERT de provocacoes.
+--
+--   Fix aqui: split no INSERT INTO public.provocacoes em vez de '-- PARTE B'.
+--
+-- Pode rodar direto. É destructive mesmo — vai apagar e recriar tudo do zero.
 --
 -- Tempo: 10-20 segundos
 -- =====================================================================
@@ -278,10 +283,65 @@ CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE PROCEDURE public.handle_new_user();
 
+
 -- ============ SEED 10 AUTORES ============
 -- =============================================================
 -- LEGENDIARIO — Seed inicial
 -- PARTE A: 10 autores fictícios com número de registro
+-- PARTE B: 10 provocações amostrais (dias 1-10) rotacionando autores
+-- =============================================================
+
+-- =============================================================
+-- PARTE A — SEED DOS 10 AUTORES FICTÍCIOS
+-- =============================================================
+
+INSERT INTO public.autores (slug, nome, numero_registro, instagram, arquetipo, cor_hex, bio_curta, persona) VALUES
+('caleb-montenegro','Caleb Montenegro','71.100','@caleb.montenegro','Veterano','#FF4D14',
+ 'Guerreiro que tomou a montanha aos 85 anos. Não foi tímido na juventude e não vai ser na velhice.',
+ 'Homem 50s, voz grave, veterano espiritual. Fala em imperativo. Rejeita desculpas. Direto e severo quando é pra confrontar, pai quando é pra acolher.'),
+
+('josue-caetano','Josué Caetano','71.204','@josue.caetano','Líder','#0A0A0A',
+ 'Atravessou o Jordão porque confiou antes de ver a água abrir. Líder não pede licença pra obedecer.',
+ 'Homem 40s, líder nato. Linguagem de comando militar. Fala curto, decide rápido, executa sem olhar pra trás.'),
+
+('davi-valverde','Davi Valverde','71.337','@davi.valverde','Adorador-Guerreiro','#4B5320',
+ 'Da pedra ao trono. A mesma mão que toca harpa corta cabeça de gigante.',
+ 'Homem 30s, ministra e luta. Mistura oração com força. Poesia cru, espada na outra mão.'),
+
+('elias-dovale','Elias do Vale','71.418','@elias.dovale','Profeta de Fogo','#D4A017',
+ 'Falou ao rei e não tremeu. Trouxe fogo do céu e fugiu da rainha. Profeta é humano, mas o recado é divino.',
+ 'Homem 40s, profético, confrontador. Linguagem apocalíptica. Não pede licença pra dizer o que ninguém quer ouvir.'),
+
+('gideao-sampaio','Gideão Sampaio','71.525','@gideao.sampaio','Estrategista','#6B5D4F',
+ 'Reduziu o exército de 32 mil a 300 e venceu com trombeta. Deus gosta de vitória sem crédito humano.',
+ 'Homem 30s, mente fria, fé quente. Planeja enquanto outros reclamam. Fala técnica com peso espiritual.'),
+
+('neemias-barros','Neemias Barros','71.612','@neemias.barros','Reconstrutor','#8B7E66',
+ 'Largou o palácio pra reconstruir muro em ruínas. Com a espada numa mão e a colher de pedreiro na outra.',
+ 'Homem 50s, pragmático, visionário. Fala de obra, projeto, reconstrução. Não faz drama, faz.'),
+
+('samuel-queiroga','Samuel Queiroga','70.089','@samuelqueiroga','Mentor','#2D4A2B',
+ 'Ungiu reis e rejeitou reis. Juiz que ouve antes de falar e fala antes de calar quando o povo teima.',
+ 'Homem 60s, sábio, paciente. Voz suave mas firme. Ensina através de pergunta e silêncio.'),
+
+('benjamim-paiva','Benjamim Paiva','72.183','@benjamim.paiva','Intensidade Bruta','#8B0000',
+ 'Tribo pequena, mordida de leão. Não precisa ser muito pra ser forte. Precisa ser inteiro.',
+ 'Homem 20s, intensidade jovem, zero filtro. Fala como rua, pensa como guerreiro.'),
+
+('ezequiel-ferraz','Ezequiel Ferraz','71.749','@ezequielferraz','Visão Profética','#333D26',
+ 'Viu ossos secos ganharem carne. Profeta que olha pro impossível e diz: profetiza aí.',
+ 'Homem 40s, visionário, simbólico. Linguagem metafórica, visões, contraste vivo/morto.'),
+
+('jonatas-pellegrino','Jônatas Pellegrino','71.866','@jonataspellegrino','Fidelidade Radical','#5C4033',
+ 'Escolheu Davi contra o próprio pai. Aliança é contrato de sangue, não de conveniência.',
+ 'Homem 30s, leal até o osso, emocionalmente maduro. Fala de amizade, pacto, irmandade sem melosidade.');
+
+
+-- =============================================================
+-- PARTE B — 10 PROVOCAÇÕES AMOSTRAIS (dias 01-01 a 01-10)
+-- Tom: devocional cristão, guerreiro, confronto, fé, posicionamento
+-- =============================================================
+
 
 
 -- ============ SEED 366 PROVOCAÇÕES ============
@@ -680,7 +740,3 @@ INSERT INTO public.provocacoes (dia_ano, mes, dia, autor_slug, autor_dia, autor_
 -- ============ VALIDAÇÃO ============
 -- SELECT COUNT(*) FROM public.autores;      -- 10
 -- SELECT COUNT(*) FROM public.provocacoes;  -- 366
---
--- Depois: teste a API em
--- https://legendiario-claude-production.up.railway.app/api/autores
--- https://legendiario-claude-production.up.railway.app/api/hoje
