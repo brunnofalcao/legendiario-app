@@ -8,19 +8,29 @@
   <link rel="manifest" href="/manifest.json">
   <link rel="icon" href="/icons/icon-192.png">
 
-  <!-- Meta Pixel -->
-  <script>/* Meta Pixel PIXEL_ID_PLACEHOLDER */</script>
-  <!-- GA4 -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=[GA4_ID]"></script>
+  <!-- OpenGraph / social share -->
+  <meta property="og:title" content="LEGENDIARIO">
+  <meta property="og:description" content="365 dias de confronto, fé e posicionamento">
+  <meta property="og:image" content="https://res.cloudinary.com/dlzrfhwin/image/upload/v1776770398/legendiario-mark-orange_kex0ij.png">
+  <meta property="og:url" content="https://app.legendiario.com">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <!-- Meta Pixel (preencher quando tiver PIXEL ID) -->
+  <!-- <script>/* PIXEL_ID_PLACEHOLDER */</script> -->
+  <!-- GA4 (preencher quando tiver ID) -->
+  <!-- <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script> -->
 
   <style>
     :root {
-      --brand-primary: #FF4D14;
-      --brand-secondary: #0A0A0A;
-      --author-1: [COR_AUTOR_1];
-      --author-2: [COR_AUTOR_2];
+      --brand-primary: #FF4D14;     /* Laranja Legendário */
+      --brand-secondary: #0A0A0A;   /* Preto Militar */
+      /* Cores dinâmicas por autor (10 personas) — sobrescritas em JS conforme autor do dia */
+      --author-color: #FF4D14;      /* default = Caleb (primária) */
       --bg: #FAFAFA;
       --text: #1A1A1A;
+      --camo-olive: #4B5320;
+      --camo-sand: #6B5D4F;
+      --camo-khaki: #8B7E66;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: -apple-system, sans-serif; background: var(--bg); color: var(--text); }
