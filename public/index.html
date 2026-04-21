@@ -817,6 +817,64 @@
     .d-acao-card-title { font-weight: 700; font-size: 15px; color: #fff; }
     .d-acao-card-sub { font-size: 12px; color: #9ad4c8; margin-top: 2px; }
     .d-acao-input { width: 100%; padding: 12px 14px; background: rgba(0,0,0,0.3); border: 1px solid rgba(20, 184, 166, 0.2); border-radius: 10px; color: #fff; font-size: 14px; margin-top: 6px; }
+
+    /* ===== TELA AÇÕES v2 ===== */
+    .d-ac-hero { margin-bottom: 22px; }
+    .d-ac-hero-title { font-family: 'Fraunces', serif; font-weight: 700; font-size: 30px; line-height: 1.1; color: var(--text-primary); letter-spacing: -0.5px; }
+    .d-ac-hero-sub { font-size: 13px; color: var(--text-muted); margin-top: 4px; letter-spacing: 0.3px; text-transform: uppercase; font-weight: 600; }
+
+    /* KPI 2x2 grid */
+    .d-ac-kpi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 22px; }
+    .d-ac-kpi { background: var(--bg-card, #141414); border: 1px solid var(--border, #222); border-radius: var(--radius-md, 14px); padding: 16px 14px; position: relative; overflow: hidden; }
+    .d-ac-kpi::before { content: ''; position: absolute; top: 0; left: 0; width: 3px; height: 100%; background: var(--accent-color, var(--accent-orange)); opacity: 0.8; }
+    .d-ac-kpi.accent-orange::before { background: #FF4D14; }
+    .d-ac-kpi.accent-green::before { background: #10B981; }
+    .d-ac-kpi.accent-amber::before { background: #F59E0B; }
+    .d-ac-kpi.accent-blue::before { background: #60A5FA; }
+    .d-ac-kpi-n { font-family: 'Fraunces', serif; font-weight: 700; font-size: 28px; color: var(--text-primary); line-height: 1; letter-spacing: -0.5px; }
+    .d-ac-kpi-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.6px; font-weight: 700; margin-top: 8px; }
+
+    /* Tabs novos */
+    .d-ac-tabs { display: flex; gap: 6px; background: var(--bg-card, #141414); border-radius: 14px; padding: 4px; margin-bottom: 16px; border: 1px solid var(--border, #222); }
+    .d-ac-tabs button { flex: 1; padding: 10px 12px; background: transparent; border: none; color: var(--text-muted); font-size: 13px; font-weight: 700; letter-spacing: 0.3px; cursor: pointer; border-radius: 10px; transition: all .18s var(--ease, cubic-bezier(.2,.8,.2,1)); display: flex; align-items: center; justify-content: center; gap: 6px; }
+    .d-ac-tabs button.active { background: var(--accent-orange, #FF4D14); color: #fff; box-shadow: 0 2px 10px rgba(255,77,20,0.25); }
+    .d-ac-tabs button:not(.active):hover { color: var(--text-primary); }
+    .d-ac-tabs .bell-badge { display: inline-flex; align-items: center; justify-content: center; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; background: #FF4D14; color: #fff; font-size: 10px; font-weight: 800; }
+    .d-ac-tabs button.active .bell-badge { background: rgba(255,255,255,0.25); }
+
+    /* Input row */
+    .d-ac-input-card { background: var(--bg-card, #141414); border: 1px solid var(--border, #222); border-radius: var(--radius-md, 14px); padding: 14px; margin-bottom: 16px; }
+    .d-ac-input-row { display: flex; gap: 10px; align-items: stretch; }
+    .d-ac-input-row input[type="text"], .d-ac-input-row input:not([type="date"]) { flex: 1; background: rgba(255,255,255,0.04); border: 1px solid var(--border, #222); border-radius: 12px; padding: 12px 14px; color: var(--text-primary); font-size: 14px; font-family: inherit; outline: none; transition: border-color .18s; }
+    .d-ac-input-row input:focus { border-color: var(--accent-orange, #FF4D14); }
+    .d-ac-input-row input[type="date"] { background: rgba(255,255,255,0.04); border: 1px solid var(--border, #222); border-radius: 12px; padding: 12px 14px; color: var(--text-primary); font-size: 13px; font-family: inherit; outline: none; max-width: 150px; color-scheme: dark; }
+    .d-ac-input-row-stacked { display: flex; flex-direction: column; gap: 10px; }
+    .d-ac-input-row-stacked .d-ac-row-2 { display: flex; gap: 10px; }
+    .d-ac-add-btn { width: 44px; min-width: 44px; height: 44px; background: var(--accent-orange, #FF4D14); border: none; border-radius: 12px; color: #fff; font-size: 22px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: transform .15s var(--ease, cubic-bezier(.2,.8,.2,1)), box-shadow .15s; box-shadow: 0 2px 10px rgba(255,77,20,0.3); }
+    .d-ac-add-btn:active { transform: scale(0.94); }
+    .d-ac-add-btn:hover { box-shadow: 0 4px 16px rgba(255,77,20,0.45); }
+
+    /* Action list items */
+    .d-ac-list { display: flex; flex-direction: column; gap: 10px; }
+    .d-ac-item { background: var(--bg-card, #141414); border: 1px solid var(--border, #222); border-radius: var(--radius-md, 14px); padding: 14px 16px; display: flex; gap: 14px; align-items: flex-start; transition: border-color .2s var(--ease, cubic-bezier(.2,.8,.2,1)), transform .15s; }
+    .d-ac-item:hover { border-color: rgba(255,77,20,0.25); }
+    .d-ac-item.done { opacity: 0.65; }
+    .d-ac-check { width: 26px; height: 26px; min-width: 26px; border-radius: 50%; border: 2px solid var(--text-muted); display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; transition: all .18s var(--ease, cubic-bezier(.2,.8,.2,1)); margin-top: 2px; background: transparent; }
+    .d-ac-check:hover { border-color: var(--accent-orange, #FF4D14); transform: scale(1.1); }
+    .d-ac-check.done { background: var(--accent-orange, #FF4D14); border-color: var(--accent-orange, #FF4D14); color: #fff; font-size: 14px; font-weight: 800; }
+    .d-ac-body { flex: 1; min-width: 0; }
+    .d-ac-title { font-size: 15px; color: var(--text-primary); font-weight: 600; line-height: 1.35; word-wrap: break-word; }
+    .d-ac-title.done { text-decoration: line-through; color: var(--text-muted); }
+    .d-ac-meta { font-size: 12px; color: var(--text-muted); margin-top: 6px; display: flex; align-items: center; gap: 8px; font-weight: 500; }
+    .d-ac-meta-chip { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 8px; background: rgba(255,255,255,0.04); font-size: 11px; }
+    .d-ac-meta-chip.urgent { background: rgba(255,77,20,0.15); color: #FF7A4D; }
+    .d-ac-meta-chip.overdue { background: rgba(239,68,68,0.15); color: #F87171; }
+
+    /* Empty state */
+    .d-ac-empty { background: var(--bg-card, #141414); border: 1px dashed var(--border, #333); border-radius: var(--radius-md, 14px); padding: 32px 20px; text-align: center; }
+    .d-ac-empty-icon { width: 48px; height: 48px; margin: 0 auto 12px; border-radius: 50%; background: rgba(255,77,20,0.1); display: flex; align-items: center; justify-content: center; font-size: 20px; color: var(--accent-orange, #FF4D14); }
+    .d-ac-empty-title { font-size: 15px; color: var(--text-primary); font-weight: 700; margin-bottom: 6px; }
+    .d-ac-empty-text { font-size: 13px; color: var(--text-muted); line-height: 1.4; max-width: 280px; margin: 0 auto; }
   </style>
 </head>
 <body>
@@ -1023,32 +1081,70 @@
 
   <!-- 3. AÇÕES -->
   <section class="view" id="view-acoes">
-    <h2 class="h2" style="margin-bottom:16px">Ações</h2>
-    <div class="tabs">
+    <!-- Hero -->
+    <div class="d-ac-hero">
+      <div class="d-ac-hero-sub">Execução</div>
+      <div class="d-ac-hero-title">Centro de Ações</div>
+    </div>
+
+    <!-- KPI 2x2 -->
+    <div class="d-ac-kpi-grid">
+      <div class="d-ac-kpi accent-orange">
+        <div class="d-ac-kpi-n" id="ac-kpi-pendentes">0</div>
+        <div class="d-ac-kpi-label">Pendentes</div>
+      </div>
+      <div class="d-ac-kpi accent-green">
+        <div class="d-ac-kpi-n" id="ac-kpi-feitas-hoje">0</div>
+        <div class="d-ac-kpi-label">Feitas hoje</div>
+      </div>
+      <div class="d-ac-kpi accent-blue">
+        <div class="d-ac-kpi-n" id="ac-kpi-total-feitas">0</div>
+        <div class="d-ac-kpi-label">Total concluídas</div>
+      </div>
+      <div class="d-ac-kpi accent-amber">
+        <div class="d-ac-kpi-n" id="ac-kpi-lembretes">0</div>
+        <div class="d-ac-kpi-label">Lembretes ativos</div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="d-ac-tabs">
       <button class="active" data-tab-acoes="pendentes">Pendentes</button>
-      <button data-tab-acoes="lembretes">Lembretes</button>
+      <button data-tab-acoes="lembretes">
+        <span>Lembretes</span>
+        <span class="bell-badge" id="ac-bell-badge" style="display:none">0</span>
+      </button>
       <button data-tab-acoes="feitas">Feitas</button>
     </div>
 
+    <!-- Tab: Pendentes -->
     <div id="acoes-pendentes-tab">
-      <div class="action-input-row">
-        <input id="new-action-input" placeholder="Nova ação..." maxlength="140">
-        <button class="btn btn-primary" id="new-action-btn">+</button>
+      <div class="d-ac-input-card">
+        <div class="d-ac-input-row">
+          <input type="text" id="new-action-input" placeholder="Nova ação que essa leitura moveu..." maxlength="140">
+          <button class="d-ac-add-btn" id="new-action-btn" aria-label="Adicionar ação">+</button>
+        </div>
       </div>
-      <div id="acoes-pendentes-list"></div>
+      <div class="d-ac-list" id="acoes-pendentes-list"></div>
     </div>
 
+    <!-- Tab: Lembretes -->
     <div id="acoes-lembretes-tab" style="display:none">
-      <div class="action-input-row">
-        <input id="new-reminder-input" placeholder="Lembrete...">
-        <input type="date" id="new-reminder-date" style="max-width:160px">
-        <button class="btn btn-primary" id="new-reminder-btn">+</button>
+      <div class="d-ac-input-card">
+        <div class="d-ac-input-row-stacked">
+          <input type="text" id="new-reminder-input" placeholder="Lembrete (ex: Ligar pro meu irmão)">
+          <div class="d-ac-row-2">
+            <input type="date" id="new-reminder-date">
+            <button class="d-ac-add-btn" id="new-reminder-btn" aria-label="Adicionar lembrete" style="flex:1; width:auto">+ Adicionar</button>
+          </div>
+        </div>
       </div>
-      <div id="acoes-lembretes-list"></div>
+      <div class="d-ac-list" id="acoes-lembretes-list"></div>
     </div>
 
+    <!-- Tab: Feitas -->
     <div id="acoes-feitas-tab" style="display:none">
-      <div id="acoes-feitas-list"></div>
+      <div class="d-ac-list" id="acoes-feitas-list"></div>
     </div>
   </section>
 
@@ -1720,38 +1816,100 @@ function showUnlockModal(mmdd) {
 
 function renderAcoes() {
   const pendentes = STATE.actions.filter(a => a.status === 'pending' && !a.reminder_date);
-  const lembretes = STATE.actions.filter(a => a.reminder_date);
+  const lembretes = STATE.actions.filter(a => a.reminder_date && a.status !== 'done');
   const feitas = STATE.actions.filter(a => a.status === 'done');
 
-  const renderList = (list, emptyMsg) => {
-    if (!list.length) return `<p class="muted" style="font-size:14px; padding:20px 0;">${emptyMsg}</p>`;
-    return list.map(a => `
-      <div class="action-item">
-        <div class="check ${a.status === 'done' ? 'done' : ''}" data-toggle-id="${a.id}">
-          ${a.status === 'done' ? '✓' : ''}
-        </div>
-        <div class="action-body">
-          <div class="action-title ${a.status === 'done' ? 'done' : ''}">${escapeHtml(a.title)}</div>
-          <div class="action-meta">
-            ${a.reminder_date ? '📅 ' + a.reminder_date : 'Criada em ' + new Date(a.created_at).toLocaleDateString('pt-BR')}
+  // === KPIs ===
+  const hojeStr = new Date().toISOString().slice(0,10);
+  const feitasHoje = feitas.filter(a => (a.completed_at || a.updated_at || '').slice(0,10) === hojeStr).length;
+
+  const setKpi = (id, v) => { const el = $('#'+id); if (el) el.textContent = v; };
+  setKpi('ac-kpi-pendentes', pendentes.length);
+  setKpi('ac-kpi-feitas-hoje', feitasHoje);
+  setKpi('ac-kpi-total-feitas', feitas.length);
+  setKpi('ac-kpi-lembretes', lembretes.length);
+
+  // Bell badge em Lembretes (só se houver lembrete futuro/hoje)
+  const bell = $('#ac-bell-badge');
+  if (bell) {
+    if (lembretes.length > 0) {
+      bell.textContent = lembretes.length;
+      bell.style.display = 'inline-flex';
+    } else {
+      bell.style.display = 'none';
+    }
+  }
+
+  // === Empty states ===
+  const emptyPendentes = `
+    <div class="d-ac-empty">
+      <div class="d-ac-empty-icon">✓</div>
+      <div class="d-ac-empty-title">Nada pendente</div>
+      <div class="d-ac-empty-text">Crie uma ação a partir da provocação de hoje ou digite uma nova acima.</div>
+    </div>`;
+  const emptyLembretes = `
+    <div class="d-ac-empty">
+      <div class="d-ac-empty-icon">◷</div>
+      <div class="d-ac-empty-title">Nenhum lembrete agendado</div>
+      <div class="d-ac-empty-text">Agende algo que você não pode deixar passar — ligação, promessa, compromisso.</div>
+    </div>`;
+  const emptyFeitas = `
+    <div class="d-ac-empty">
+      <div class="d-ac-empty-icon">★</div>
+      <div class="d-ac-empty-title">Nenhuma ação concluída ainda</div>
+      <div class="d-ac-empty-text">Ação executada vira legado. Começa pela primeira.</div>
+    </div>`;
+
+  // === Render list ===
+  const renderList = (list, empty) => {
+    if (!list.length) return empty;
+    return list.map(a => {
+      const done = a.status === 'done';
+      let metaChip = '';
+      if (a.reminder_date) {
+        const rd = a.reminder_date;
+        const isOverdue = !done && rd < hojeStr;
+        const isToday = rd === hojeStr;
+        const cls = isOverdue ? 'overdue' : (isToday ? 'urgent' : '');
+        const label = isOverdue ? 'ATRASADO · ' + formatBRDate(rd) : (isToday ? 'HOJE · ' + formatBRDate(rd) : formatBRDate(rd));
+        metaChip = `<span class="d-ac-meta-chip ${cls}">◷ ${label}</span>`;
+      } else {
+        metaChip = `<span class="d-ac-meta-chip">Criada em ${formatBRDate((a.created_at||'').slice(0,10))}</span>`;
+      }
+      return `
+        <div class="d-ac-item ${done ? 'done' : ''}">
+          <button class="d-ac-check ${done ? 'done' : ''}" data-toggle-id="${a.id}" aria-label="${done ? 'Desfazer' : 'Marcar como feito'}">
+            ${done ? '✓' : ''}
+          </button>
+          <div class="d-ac-body">
+            <div class="d-ac-title ${done ? 'done' : ''}">${escapeHtml(a.title)}</div>
+            <div class="d-ac-meta">${metaChip}</div>
           </div>
         </div>
-      </div>
-    `).join('');
+      `;
+    }).join('');
   };
 
-  $('#acoes-pendentes-list').innerHTML = renderList(pendentes, 'Nenhuma ação pendente. Crie uma a partir de uma provocação ou aqui acima.');
-  $('#acoes-lembretes-list').innerHTML = renderList(lembretes, 'Nenhum lembrete agendado.');
-  $('#acoes-feitas-list').innerHTML = renderList(feitas, 'Nenhuma ação concluída ainda.');
+  $('#acoes-pendentes-list').innerHTML = renderList(pendentes, emptyPendentes);
+  $('#acoes-lembretes-list').innerHTML = renderList(lembretes, emptyLembretes);
+  $('#acoes-feitas-list').innerHTML = renderList(feitas, emptyFeitas);
 
   // Toggle handlers
-  $$('.check[data-toggle-id]').forEach(el => {
+  $$('.d-ac-check[data-toggle-id]').forEach(el => {
     el.onclick = async () => {
       await toggleAction(el.dataset.toggleId);
       renderAcoes();
       renderRitmo();
     };
   });
+}
+
+function formatBRDate(iso) {
+  if (!iso) return '—';
+  try {
+    const [y,m,d] = iso.split('-');
+    return `${d}/${m}/${y.slice(2)}`;
+  } catch { return iso; }
 }
 
 function renderRitmo() {
