@@ -1572,15 +1572,28 @@ function bindEvents() {
     STATE.shares++;
   };
 
-  // Stories (placeholder — implementar canvas depois)
-  $('#btn-share-story').onclick = () => {
-    toast('Export Stories em desenvolvimento');
+  // Instagram button (abre perfil do autor)
+  const btnInsta = $('#btn-insta');
+  if (btnInsta) btnInsta.onclick = () => {
+    const mmdd = todayMMDD();
+    const p = STATE.provocacoes.get(mmdd);
+    if (!p) return;
+    const autor = getAutor(p.autor_slug);
+    const handle = (autor.instagram || '@legendiario').replace('@', '');
+    window.open(`https://instagram.com/${handle}`, '_blank');
   };
 
-  // Criar ação a partir de hoje
-  $('#btn-criar-acao').onclick = () => {
-    switchView('acoes');
-    setTimeout(() => $('#new-action-input').focus(), 200);
+  // Input rápido de ação (na tela HOJE)
+  const quickInput = $('#quick-acao-input');
+  if (quickInput) quickInput.onkeydown = async (e) => {
+    if (e.key !== 'Enter') return;
+    const t = quickInput.value.trim();
+    if (!t) return;
+    const a = await createAction(t);
+    if (a) {
+      quickInput.value = '';
+      toast('Ação registrada');
+    }
   };
 
   // AUTH TABS (signin / signup)
