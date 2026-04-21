@@ -761,6 +761,55 @@
     .d-btn-share { width: 100%; margin-top: 10px; padding: 14px; background: rgba(255, 77, 20, 0.08); color: var(--brand); border: 1px solid rgba(255, 77, 20, 0.25); border-radius: 999px; font-weight: 700; font-size: 15px; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; }
     .d-btn-share .count { background: rgba(255, 77, 20, 0.2); padding: 3px 10px; border-radius: 10px; font-size: 12px; font-weight: 800; }
 
+    /* ========== DIAS (calendário) ========== */
+    .d-cal-header { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; }
+    .d-cal-nav { width: 40px; height: 40px; border-radius: 50%; background: var(--bg-secondary); display: flex; align-items: center; justify-content: center; color: var(--text-primary); border: 1px solid var(--border); cursor: pointer; font-size: 18px; font-weight: 700; flex-shrink: 0; }
+    .d-cal-title-wrap { flex: 1; text-align: center; }
+    .d-cal-title { font-family: 'Fraunces', serif; font-size: 26px; font-weight: 600; line-height: 1; color: var(--text-primary); }
+    .d-cal-title-sub { font-size: 11px; color: var(--text-secondary); letter-spacing: 2.5px; font-weight: 700; margin-top: 4px; }
+
+    .d-cal-progress { padding: 14px 18px; background: var(--bg-secondary); border-radius: var(--radius-md); margin-bottom: 20px; border: 1px solid var(--border); }
+    .d-cal-progress-top { display: flex; justify-content: space-between; align-items: center; }
+    .d-cal-progress-label { font-size: 11px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1.5px; font-weight: 700; }
+    .d-cal-progress-pct { font-size: 14px; color: var(--accent-orange); font-weight: 800; font-variant-numeric: tabular-nums; }
+    .d-cal-progress-bar { height: 3px; background: var(--bg-tertiary); border-radius: 2px; margin-top: 10px; overflow: hidden; }
+    .d-cal-progress-fill { height: 100%; background: var(--accent-orange); border-radius: 2px; transition: width .4s var(--ease-out); }
+
+    .d-cal-weekdays { display: grid; grid-template-columns: repeat(7, 1fr); margin-bottom: 10px; }
+    .d-cal-wd { text-align: center; font-size: 11px; color: var(--text-tertiary); font-weight: 700; letter-spacing: 1px; }
+    .d-cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+    .d-cal-day { aspect-ratio: 1; border-radius: var(--radius-sm); display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; position: relative; color: var(--text-primary); background: transparent; border: 1px solid transparent; font-variant-numeric: tabular-nums; transition: transform 150ms var(--ease-out); cursor: default; }
+    .d-cal-day-empty { visibility: hidden; }
+    .d-cal-day-future { color: var(--text-tertiary); }
+    .d-cal-day-lido { background: rgba(255,77,20,0.08); color: var(--accent-orange); border-color: rgba(255,77,20,0.25); }
+    .d-cal-day-lido::after { content: ''; position: absolute; bottom: 4px; width: 3px; height: 3px; border-radius: 50%; background: var(--accent-orange); }
+    .d-cal-day-perdido { color: var(--state-danger); border-color: rgba(139,0,0,0.5); cursor: pointer; }
+    .d-cal-day-perdido::after { content: ''; position: absolute; bottom: 4px; width: 3px; height: 3px; border-radius: 50%; background: var(--state-danger); }
+    .d-cal-day-perdido:hover { background: rgba(139,0,0,0.1); }
+    .d-cal-day-hoje { background: var(--accent-orange); color: white; box-shadow: 0 0 0 3px rgba(255,77,20,0.25); }
+    .d-cal-day-desbloq { background: rgba(75,122,73,0.12); color: var(--state-success); border-color: rgba(75,122,73,0.4); }
+
+    .d-cal-legend { display: flex; gap: 20px; margin: 22px 0 16px; font-size: 11px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1.5px; font-weight: 700; }
+    .d-cal-legend-item { display: inline-flex; align-items: center; gap: 6px; }
+    .d-cal-legend-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent-orange); }
+    .d-cal-legend-dot.perdido { background: var(--state-danger); }
+    .d-cal-legend-dot.hoje { background: transparent; border: 2px solid var(--accent-orange); width: 10px; height: 10px; }
+
+    .d-cal-info-card { border-radius: var(--radius-lg); overflow: hidden; margin-top: 10px; background: linear-gradient(180deg, #1a1a1a 0%, #2a2a2a 100%); border: 1px solid var(--border); }
+    .d-cal-info-header { display: flex; align-items: center; gap: 12px; padding: 16px 18px; color: var(--text-primary); }
+    .d-cal-info-header .d-avatar { width: 36px; height: 36px; }
+    .d-cal-info-header-meta { flex: 1; min-width: 0; }
+    .d-cal-info-header-name { font-weight: 700; font-size: 15px; }
+    .d-cal-info-header-sub { font-size: 12px; color: var(--text-secondary); }
+    .d-cal-info-status { padding: 4px 12px; border-radius: 999px; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; display: inline-flex; align-items: center; gap: 4px; }
+    .d-cal-info-status.liberado { background: rgba(75,122,73,0.18); color: #7ac27a; }
+    .d-cal-info-status.bloqueado { background: rgba(139,0,0,0.18); color: #ff7b7b; }
+    .d-cal-info-body { padding: 28px 22px 22px; background: white; color: var(--bg-primary); text-align: center; }
+    .d-cal-info-icon { width: 44px; height: 44px; background: rgba(0,150,255,0.1); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 14px; font-size: 20px; color: var(--accent-orange); }
+    .d-cal-info-text { font-size: 14px; line-height: 1.5; margin-bottom: 20px; color: #333; }
+    .d-cal-info-text strong { color: var(--bg-primary); font-weight: 700; }
+    .d-cal-info-btn { display: block; width: 100%; padding: 16px; background: var(--accent-orange); color: white; border-radius: var(--radius-pill); font-weight: 800; font-size: 15px; letter-spacing: 0.5px; border: none; cursor: pointer; }
+
     /* Card de ação (CTA escuro-verde) */
     .d-acao-card { background: linear-gradient(135deg, #1a3a35, #0f2420); border: 1px solid #2a6458; border-radius: 20px; padding: 20px; margin-top: 14px; }
     .d-acao-card-header { display: flex; gap: 14px; align-items: flex-start; margin-bottom: 14px; }
@@ -910,11 +959,66 @@
     </div>
   </section>
 
-  <!-- 2. DIAS -->
-  <section class="view" id="view-dias">
-    <h2 class="h2" style="margin-bottom:6px">365 dias</h2>
-    <p class="muted" style="margin-bottom:24px; font-size:14px;" id="dias-resumo">— lidos · — perdidos</p>
-    <div id="meses-container"></div>
+  <!-- 2. DIAS (redesign v2) -->
+  <section class="view" id="view-dias" style="padding:0">
+    <div class="d-shell">
+      <!-- Navegação mês -->
+      <div class="d-cal-header">
+        <button class="d-cal-nav" id="cal-prev" aria-label="Mês anterior">‹</button>
+        <div class="d-cal-title-wrap">
+          <div class="d-cal-title" id="cal-month-title">—</div>
+          <div class="d-cal-title-sub" id="cal-year-sub">—</div>
+        </div>
+        <button class="d-cal-nav" id="cal-next" aria-label="Próximo mês">›</button>
+      </div>
+
+      <!-- Progresso do mês -->
+      <div class="d-cal-progress">
+        <div class="d-cal-progress-top">
+          <span class="d-cal-progress-label" id="cal-prog-label">0 DE 0 DIAS LIDOS</span>
+          <span class="d-cal-progress-pct" id="cal-prog-pct">0%</span>
+        </div>
+        <div class="d-cal-progress-bar"><div class="d-cal-progress-fill" id="cal-prog-fill" style="width:0%"></div></div>
+      </div>
+
+      <!-- Weekdays -->
+      <div class="d-cal-weekdays">
+        <div class="d-cal-wd">D</div>
+        <div class="d-cal-wd">S</div>
+        <div class="d-cal-wd">T</div>
+        <div class="d-cal-wd">Q</div>
+        <div class="d-cal-wd">Q</div>
+        <div class="d-cal-wd">S</div>
+        <div class="d-cal-wd">S</div>
+      </div>
+
+      <!-- Grid -->
+      <div class="d-cal-grid" id="cal-grid"></div>
+
+      <!-- Legenda -->
+      <div class="d-cal-legend">
+        <span class="d-cal-legend-item"><span class="d-cal-legend-dot"></span> LIDO</span>
+        <span class="d-cal-legend-item"><span class="d-cal-legend-dot perdido"></span> PERDIDO</span>
+        <span class="d-cal-legend-item"><span class="d-cal-legend-dot hoje"></span> HOJE</span>
+      </div>
+
+      <!-- Card info dia selecionado -->
+      <div class="d-cal-info-card" id="cal-info-card" style="display:none">
+        <div class="d-cal-info-header">
+          <div class="d-avatar d-avatar-outline" id="cal-info-avatar">—</div>
+          <div class="d-cal-info-header-meta">
+            <div class="d-cal-info-header-name" id="cal-info-name">—</div>
+            <div class="d-cal-info-header-sub" id="cal-info-sub">—</div>
+          </div>
+          <span class="d-cal-info-status" id="cal-info-status">—</span>
+        </div>
+        <div class="d-cal-info-body">
+          <div class="d-cal-info-icon">📖</div>
+          <div class="d-cal-info-text" id="cal-info-text">A leitura de hoje está na aba <strong>Hoje</strong>.</div>
+          <button class="d-cal-info-btn" id="cal-info-btn">Ir para Hoje →</button>
+        </div>
+      </div>
+    </div>
   </section>
 
   <!-- 3. AÇÕES -->
@@ -1448,54 +1552,146 @@ function renderCredits() {
   $('#credits-n').textContent = STATE.credits;
 }
 
+// Estado do calendário: mês atualmente visualizado (0-11)
+let calViewMonth = new Date().getMonth();
+let calViewYear = new Date().getUTCFullYear();
+
 function renderDias() {
-  const container = $('#meses-container');
-  container.innerHTML = '';
-  const meses = ['JANEIRO','FEVEREIRO','MARÇO','ABRIL','MAIO','JUNHO','JULHO','AGOSTO','SETEMBRO','OUTUBRO','NOVEMBRO','DEZEMBRO'];
-  const year = new Date().getUTCFullYear();
+  const meses = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
   const today = todayMMDD();
+  const now = new Date();
+  const todayM = now.getMonth();
 
-  let totalLidos = 0, totalPerdidos = 0;
+  const m = calViewMonth + 1; // 1-12
+  const daysInMonth = new Date(calViewYear, m, 0).getDate();
+  const firstWeekday = new Date(calViewYear, calViewMonth, 1).getDay(); // 0=Dom
 
-  for (let m = 1; m <= 12; m++) {
-    const block = document.createElement('div');
-    block.className = 'mes-block';
-    const daysInMonth = new Date(year, m, 0).getDate();
+  // Header
+  $('#cal-month-title').textContent = meses[calViewMonth];
+  $('#cal-year-sub').textContent = calViewYear;
 
-    let lidosNoMes = 0;
+  // Contagens
+  let lidosNoMes = 0;
+  for (let d = 1; d <= daysInMonth; d++) {
+    const mmdd = `${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    if (STATE.readDays.has(mmdd) || STATE.unlockedDays.has(mmdd)) lidosNoMes++;
+  }
+  const pct = Math.round((lidosNoMes / daysInMonth) * 100);
+  $('#cal-prog-label').textContent = `${lidosNoMes} DE ${daysInMonth} DIAS LIDOS`;
+  $('#cal-prog-pct').textContent = pct + '%';
+  $('#cal-prog-fill').style.width = pct + '%';
 
-    const gridHtml = [];
-    for (let d = 1; d <= daysInMonth; d++) {
-      const mmdd = `${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-      let cls = 'dia-cell';
-      if (mmdd === today) cls += ' dia-hoje';
-      else if (STATE.readDays.has(mmdd)) { cls += ' dia-lido'; lidosNoMes++; totalLidos++; }
-      else if (STATE.unlockedDays.has(mmdd)) { cls += ' dia-desbloqueado'; lidosNoMes++; totalLidos++; }
-      else if (mmdd < today && isWithinSubscription(mmdd)) { cls += ' dia-perdido'; totalPerdidos++; }
-      else if (mmdd > today) cls += ' dia-futuro';
-      gridHtml.push(`<div class="${cls}" data-mmdd="${mmdd}">${d}</div>`);
-    }
+  // Grid
+  const grid = $('#cal-grid');
+  let html = '';
+  // Espaços vazios antes do dia 1
+  for (let i = 0; i < firstWeekday; i++) {
+    html += `<div class="d-cal-day d-cal-day-empty"></div>`;
+  }
+  for (let d = 1; d <= daysInMonth; d++) {
+    const mmdd = `${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    let cls = 'd-cal-day';
+    if (mmdd === today) cls += ' d-cal-day-hoje';
+    else if (STATE.readDays.has(mmdd)) cls += ' d-cal-day-lido';
+    else if (STATE.unlockedDays.has(mmdd)) cls += ' d-cal-day-desbloq';
+    else if (mmdd < today && isWithinSubscription(mmdd)) cls += ' d-cal-day-perdido';
+    else if (mmdd > today) cls += ' d-cal-day-future';
+    const dd = String(d).padStart(2, '0');
+    html += `<div class="${cls}" data-mmdd="${mmdd}">${dd}</div>`;
+  }
+  grid.innerHTML = html;
 
-    block.innerHTML = `
-      <div class="mes-titulo">
-        <span>${meses[m-1]}</span>
-        <span class="mes-stats">${lidosNoMes}/${daysInMonth}</span>
-      </div>
-      <div class="dias-grid">${gridHtml.join('')}</div>
-    `;
-    container.appendChild(block);
+  // Selecionar dia de hoje por padrão (se estiver no mês visível)
+  if (calViewMonth === todayM) {
+    showDayInfo(today);
+  } else {
+    $('#cal-info-card').style.display = 'none';
   }
 
-  $('#dias-resumo').innerHTML = `<strong style="color:var(--text)">${totalLidos}</strong> lidos · <strong style="color:var(--danger)">${totalPerdidos}</strong> perdidos`;
-
-  // Delegation: clicar em dia perdido abre modal de unlock
-  container.addEventListener('click', (e) => {
-    const cell = e.target.closest('.dia-cell.dia-perdido');
-    if (!cell) return;
-    const mmdd = cell.dataset.mmdd;
-    showUnlockModal(mmdd);
+  // Click handlers nos dias
+  grid.querySelectorAll('.d-cal-day').forEach(el => {
+    if (el.classList.contains('d-cal-day-empty')) return;
+    el.onclick = () => {
+      const mmdd = el.dataset.mmdd;
+      if (el.classList.contains('d-cal-day-perdido')) {
+        showUnlockModal(mmdd);
+      } else {
+        showDayInfo(mmdd);
+      }
+    };
   });
 }
+
+function showDayInfo(mmdd) {
+  const p = STATE.provocacoes.get(mmdd);
+  if (!p) { $('#cal-info-card').style.display = 'none'; return; }
+  const autor = getAutor(p.autor_slug);
+  const today = todayMMDD();
+  const isToday = mmdd === today;
+  const isLido = STATE.readDays.has(mmdd) || STATE.unlockedDays.has(mmdd);
+  const isPerdido = mmdd < today && !isLido;
+
+  const [mm, dd] = mmdd.split('-');
+  const meses = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+  const mesName = meses[parseInt(mm)-1];
+
+  // Calcular dia do ano
+  const d = new Date(new Date().getFullYear(), parseInt(mm)-1, parseInt(dd));
+  const dayOfYear = Math.floor((d - new Date(d.getFullYear(), 0, 0)) / 86400000);
+
+  const initials = (autor.nome || '—').split(' ').map(s => s[0]).filter(Boolean).slice(0, 2).join('').toUpperCase();
+  $('#cal-info-avatar').textContent = initials;
+  $('#cal-info-name').textContent = autor.nome;
+  $('#cal-info-sub').textContent = `${parseInt(dd)} ${mesName} · Dia ${dayOfYear}`;
+
+  const statusEl = $('#cal-info-status');
+  if (isToday || isLido) {
+    statusEl.className = 'd-cal-info-status liberado';
+    statusEl.innerHTML = '✓ LIBERADO';
+  } else if (isPerdido) {
+    statusEl.className = 'd-cal-info-status bloqueado';
+    statusEl.innerHTML = '⚠ PERDIDO';
+  } else {
+    statusEl.className = 'd-cal-info-status';
+    statusEl.innerHTML = '🔒 FUTURO';
+  }
+
+  if (isToday) {
+    $('#cal-info-text').innerHTML = 'A leitura de hoje está na aba <strong>Hoje</strong>.';
+    $('#cal-info-btn').textContent = 'Ir para Hoje →';
+    $('#cal-info-btn').onclick = () => switchView('hoje');
+  } else if (isLido) {
+    $('#cal-info-text').innerHTML = `Você já leu essa provocação. <strong>Reler?</strong>`;
+    $('#cal-info-btn').textContent = 'Reler →';
+    $('#cal-info-btn').onclick = () => alert('Reler dia: funcionalidade em breve. Por ora, abre a HOJE.');
+  } else if (isPerdido) {
+    $('#cal-info-text').innerHTML = `Dia perdido. Gaste <strong>1 crédito</strong> pra desbloquear.`;
+    $('#cal-info-btn').textContent = `Desbloquear (${STATE.credits} créditos)`;
+    $('#cal-info-btn').onclick = () => showUnlockModal(mmdd);
+  } else {
+    $('#cal-info-text').innerHTML = 'Essa provocação estará disponível no dia.';
+    $('#cal-info-btn').textContent = 'Ver HOJE →';
+    $('#cal-info-btn').onclick = () => switchView('hoje');
+  }
+
+  $('#cal-info-card').style.display = 'block';
+}
+
+// Navegação de mês
+document.addEventListener('DOMContentLoaded', () => {
+  const prev = document.getElementById('cal-prev');
+  const next = document.getElementById('cal-next');
+  if (prev) prev.onclick = () => {
+    calViewMonth--;
+    if (calViewMonth < 0) { calViewMonth = 11; calViewYear--; }
+    renderDias();
+  };
+  if (next) next.onclick = () => {
+    calViewMonth++;
+    if (calViewMonth > 11) { calViewMonth = 0; calViewYear++; }
+    renderDias();
+  };
+});
 
 function showUnlockModal(mmdd) {
   const p = STATE.provocacoes.get(mmdd);
