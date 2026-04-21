@@ -1,23 +1,25 @@
 -- =====================================================================
--- LEGENDIARIO — MIGRAÇÃO V2.2 (FIX: seed autores estava vazio)
+-- LEGENDIARIO — MIGRAÇÃO V2.3 (ATÔMICA)
 --
 -- Projeto Supabase: dmgebgofjhtgunhhetee
 -- Link: https://supabase.com/dashboard/project/dmgebgofjhtgunhhetee/sql/new
 --
--- ⚠️ DESTRUTIVO: APAGA e RECRIA tabelas.
+-- IMPORTANTE ANTES DE RODAR:
+--   1. Clica DENTRO do editor SQL
+--   2. Pressiona Cmd+A (seleciona tudo que está lá, pra limpar)
+--   3. Deleta o que tiver
+--   4. Cola ESTE arquivo INTEIRO
+--   5. Clica Run (NÃO SELECIONA NADA com o mouse — se selecionar, roda só seleção)
 --
--- V2.2 fix:
---   Bug anterior (V2.1): header do arquivo 03_seed_provocacoes.sql mencionava
---   "-- PARTE B" dentro do comentário de overview (linha 4), e meu script de
---   geração splitava nessa string cortando ANTES dos INSERTs de autores.
---   Resultado: seed autores vazio → FK violation no INSERT de provocacoes.
---
---   Fix aqui: split no INSERT INTO public.provocacoes em vez de '-- PARTE B'.
---
--- Pode rodar direto. É destructive mesmo — vai apagar e recriar tudo do zero.
+-- V2.3 tem 3 proteções novas:
+--   - BEGIN; ... COMMIT; envolve tudo em UMA transação (tudo-ou-nada)
+--   - Check-valve após seed autores: RAISE EXCEPTION se autores estiver vazio
+--   - Validação final com COUNT no próprio script
 --
 -- Tempo: 10-20 segundos
 -- =====================================================================
+
+BEGIN;
 
 -- ============ DROP existente ============
 DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
@@ -33,7 +35,7 @@ DROP TABLE IF EXISTS public.users CASCADE;
 DROP TABLE IF EXISTS public.autores CASCADE;
 DROP FUNCTION IF EXISTS update_updated_at_column() CASCADE;
 
--- ============ SCHEMA V2 ============
+-- ============ SCHEMA ============
 -- =============================================================
 -- LEGENDIARIO — Schema Supabase
 -- Rodar no SQL Editor do Supabase (projeto novo)
@@ -187,7 +189,7 @@ CREATE TRIGGER update_autores_updated_at BEFORE UPDATE ON public.autores
    FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
 
 
--- ============ RLS POLICIES V2.1 ============
+-- ============ RLS ============
 -- =============================================================
 -- LEGENDIARIO — Row Level Security (RLS)
 -- Aplicar DEPOIS de 01_schema.sql
@@ -343,6 +345,18 @@ INSERT INTO public.autores (slug, nome, numero_registro, instagram, arquetipo, c
 -- =============================================================
 
 
+
+-- ============ CHECK-VALVE: autores devem existir antes de provocacoes ============
+DO $$
+DECLARE
+  n INT;
+BEGIN
+  SELECT COUNT(*) INTO n FROM public.autores;
+  IF n < 10 THEN
+    RAISE EXCEPTION 'SEED AUTORES FALHOU: esperava 10, achou %. Abortando pra proteger dados.', n;
+  END IF;
+  RAISE NOTICE '✓ Autores OK: % rows', n;
+END $$;
 
 -- ============ SEED 366 PROVOCAÇÕES ============
 
@@ -737,6 +751,27 @@ INSERT INTO public.provocacoes (dia_ano, mes, dia, autor_slug, autor_dia, autor_
 ('12-31', 12, 31, 'gideao-sampaio', 'Gideão Sampaio', '71.525', 'Paz.', 'Juízes 6:24', 'No fim de ano — tu tem paz real, ou só tá exausto?', 'Gideão construiu altar: Senhor é paz. Fim de ano tu avalia. Paz real vem de caminhar com Deus — não de listas cumpridas. Tu tem paz? Sem, avalia: o que desalinhou? Uma coisa específica pra reconstruir em janeiro. Ano novo de altar de paz.', 'Paz real é termômetro do caminho. Sem, desviou.', '@gideao.sampaio');
 
 
--- ============ VALIDAÇÃO ============
--- SELECT COUNT(*) FROM public.autores;      -- 10
--- SELECT COUNT(*) FROM public.provocacoes;  -- 366
+-- ============ VALIDAÇÃO FINAL ============
+DO $$
+DECLARE
+  n_autores INT;
+  n_provs INT;
+BEGIN
+  SELECT COUNT(*) INTO n_autores FROM public.autores;
+  SELECT COUNT(*) INTO n_provs FROM public.provocacoes;
+  IF n_autores <> 10 THEN
+    RAISE EXCEPTION 'ERRO: autores tem % rows, esperado 10', n_autores;
+  END IF;
+  IF n_provs <> 366 THEN
+    RAISE EXCEPTION 'ERRO: provocacoes tem % rows, esperado 366', n_provs;
+  END IF;
+  RAISE NOTICE '✓ SUCESSO: % autores, % provocacoes', n_autores, n_provs;
+END $$;
+
+COMMIT;
+
+-- ============ PÓS-RUN ============
+-- Rode estas queries pra confirmar:
+--   SELECT COUNT(*) FROM public.autores;      -- esperado 10
+--   SELECT COUNT(*) FROM public.provocacoes;  -- esperado 366
+--   SELECT dia_ano, autor_dia, autor_numero FROM public.provocacoes WHERE dia_ano = '04-21';
