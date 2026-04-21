@@ -159,14 +159,164 @@ function requireAdmin(req, res, next) {
   next();
 }
 
-// GET  /api/admin/users
-// GET  /api/admin/demographics
-// GET  /api/admin/financial
-// GET  /api/admin/hooked       (retenção por coorte)
-// GET  /api/admin/investor     (dashboards macro)
-// POST /api/admin/provocacoes  (editar conteúdo)
-// POST /api/admin/whatsapp/test
-// POST /api/admin/whatsapp/send (broadcast)
+// GET /api/admin/stats — contagens rápidas pro dashboard executivo
+app.get('/api/admin/stats', requireAdmin, async (req, res) => {
+  if (!supabase) return res.status(503).json({ error: 'db not configured' });
+  try {
+    const [u, p, r, a] = await Promise.all([
+      supabase.from('users').select('*', { count: 'exact', head: true }),
+      supabase.from('provocacoes').select('*', { count: 'exact', head: true }),
+      supabase.from('user_reads').select('*', { count: 'exact', head: true }),
+      supabase.from('user_actions').select('*', { count: 'exact', head: true }),
+    ]);
+    res.json({
+      users: u.count || 0,
+      provocacoes: p.count || 0,
+      reads: r.count || 0,
+      actions: a.count || 0,
+    });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// GET /api/admin/users — lista usuários com contagem de leituras
+app.get('/api/admin/users', requireAdmin, async (req, res) => {
+  if (!supabase) return res.status(503).json({ error: 'db not configured' });
+  const { data: users, error } = await supabase
+    .from('users')
+    .select('*')
+    .order('created_at', { ascending: false });
+  if (error) return res.status(500).json({ error: error.message });
+
+  // Agregar reads por user
+  const { data: reads } = await supabase.from('user_reads').select('user_id');
+  const readsCount = {};
+  (reads || []).forEach(r => { readsCount[r.user_id] = (readsCount[r.user_id] || 0) + 1; });
+  const enriched = users.map(u => ({ ...u, reads_count: readsCount[u.id] || 0 }));
+  res.json(enriched);
+});
+
+// POST /api/admin/create-user — cria user via Supabase Admin API (sem precisar confirmar email)
+app.post('/api/admin/create-user', requireAdmin, async (req, res) => {
+  if (!supabase) return res.status(503).json({ error: 'db not configured' });
+  const { email, password, nome } = req.body || {};
+  if (!email || !password || password.length < 6) {
+    return res.status(400).json({ error: 'email + senha (6+ chars) obrigatórios' });
+  }
+  try {
+    const { data, error } = await supabase.auth.admin.createUser({
+      email,
+      password,
+      email_confirm: true, // pula confirmação
+      user_metadata: { nome }
+    });
+    if (error) return res.status(400).json({ error: error.message });
+    // Trigger do schema já cria public.users — mas garantir:
+    await supabase.from('users').upsert({
+      id: data.user.id,
+      email: data.user.email,
+      nome: nome || null,
+      perfil_completo: false,
+    }, { onConflict: 'id' });
+    res.json({ ok: true, user_id: data.user.id, email });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// PATCH /api/admin/provocacao/:id — editar uma provocação
+app.patch('/api/admin/provocacao/:id', requireAdmin, async (req, res) => {
+  if (!supabase) return res.status(503).json({ error: 'db not configured' });
+  const { id } = req.params;
+  const allowedFields = ['autor_slug', 'autor_dia', 'autor_numero', 'citacao', 'autor_citacao', 'pergunta', 'texto', 'aspas_autor', 'instagram'];
+  const patch = {};
+  for (const f of allowedFields) if (f in req.body) patch[f] = req.body[f];
+  patch.updated_at = new Date().toISOString();
+  const { data, error } = await supabase.from('provocacoes').update(patch).eq('id', id).select().single();
+  if (error) return res.status(500).json({ error: error.message });
+  res.json(data);
+});
+
+// DELETE /api/admin/provocacao/:id
+app.delete('/api/admin/provocacao/:id', requireAdmin, async (req, res) => {
+  if (!supabase) return res.status(503).json({ error: 'db not configured' });
+  const { error } = await supabase.from('provocacoes').delete().eq('id', req.params.id);
+  if (error) return res.status(500).json({ error: error.message });
+  res.json({ ok: true });
+});
+
+// GET /api/admin/demographics — agregados simples
+app.get('/api/admin/demographics', requireAdmin, async (req, res) => {
+  if (!supabase) return res.status(503).json({ error: 'db not configured' });
+  const { data: users } = await supabase.from('users').select('estado, profissao, whatsapp_hour, genero');
+  const groupBy = (field, fmt) => {
+    const counts = {};
+    (users || []).forEach(u => {
+      const k = u[field];
+      if (k != null && k !== '') counts[k] = (counts[k] || 0) + 1;
+    });
+    return Object.entries(counts)
+      .map(([key, count]) => ({ key, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 20);
+  };
+  res.json({
+    estado: groupBy('estado'),
+    profissao: groupBy('profissao'),
+    whatsapp_hour: groupBy('whatsapp_hour'),
+    genero: groupBy('genero'),
+  });
+});
+
+// GET /api/admin/whatsapp-status — checar config + logs recentes
+app.get('/api/admin/whatsapp-status', requireAdmin, async (req, res) => {
+  const token = (process.env.WA_TOKEN || '').trim();
+  const status = {
+    token_configured: !!(token && !token.includes('PENDENTE') && !token.includes('REUSAR')),
+    phone_configured: !!(process.env.WA_PHONE_NUMBER_ID && !String(process.env.WA_PHONE_NUMBER_ID).includes('PENDENTE') && !String(process.env.WA_PHONE_NUMBER_ID).includes('REUSAR')),
+    waba_configured: !!(process.env.WA_WABA_ID && !String(process.env.WA_WABA_ID).includes('PENDENTE') && !String(process.env.WA_WABA_ID).includes('REUSAR')),
+    api_version: process.env.WA_API_VERSION || 'v22.0',
+  };
+  if (supabase) {
+    const { data } = await supabase
+      .from('whatsapp_logs')
+      .select('created_at, telefone, template, status, error_message')
+      .order('created_at', { ascending: false })
+      .limit(20);
+    status.recent_logs = data || [];
+  }
+  res.json(status);
+});
+
+// POST /api/admin/whatsapp-test — enviar template pra um número
+app.post('/api/admin/whatsapp-test', requireAdmin, async (req, res) => {
+  const { phone, template } = req.body || {};
+  if (!phone || !template) return res.status(400).json({ error: 'phone + template obrigatórios' });
+  try {
+    const r = await sendTemplate(phone, template, ['Teste']);
+    if (supabase) {
+      await supabase.from('whatsapp_logs').insert({
+        telefone: phone,
+        template,
+        status: 'sent',
+        meta_message_id: r.data?.messages?.[0]?.id || null,
+      });
+    }
+    res.json({ ok: true, meta: r.data });
+  } catch (e) {
+    const errMsg = e.response?.data?.error?.message || e.message;
+    if (supabase) {
+      await supabase.from('whatsapp_logs').insert({
+        telefone: phone,
+        template,
+        status: 'failed',
+        error_message: errMsg,
+      });
+    }
+    res.status(400).json({ error: errMsg });
+  }
+});
 
 // =============================================
 // WEBHOOK HOTMART (compra aprovada)

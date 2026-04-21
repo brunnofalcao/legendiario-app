@@ -4,33 +4,876 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>LEGENDIARIO — Admin</title>
+  <link rel="icon" href="https://res.cloudinary.com/dlzrfhwin/image/upload/v1776770400/legendiario-icon-192_fxbguo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Fraunces:ital,wght@0,400;0,500;1,400;1,500&display=swap" rel="stylesheet">
   <style>
-    :root { --brand: #FF4D14; --gold: #0A0A0A; }
-    /* Design-responsive (desktop + mobile). Ver Manual Técnico seção 7 */
+    :root {
+      --brand: #FF4D14;
+      --black: #0A0A0A;
+      --bg: #0A0A0A;
+      --bg-card: #1A1A1A;
+      --bg-card-2: #252525;
+      --text: #FFFFFF;
+      --text-dim: #9A9A9A;
+      --text-muted: #5A5A5A;
+      --border: #2A2A2A;
+      --ok: #4B7A49;
+      --danger: #8B0000;
+      --warn: #D4A017;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html, body { height: 100%; }
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+    button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+    input, textarea, select {
+      font-family: inherit;
+      background: var(--bg-card);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 10px 12px;
+      font-size: 14px;
+      width: 100%;
+    }
+    textarea { font-family: 'Inter'; min-height: 100px; resize: vertical; line-height: 1.5; }
+    input:focus, textarea:focus, select:focus { outline: 2px solid var(--brand); border-color: transparent; }
+
+    /* Layout */
+    .topbar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 24px;
+      background: var(--black);
+      border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; z-index: 10;
+    }
+    .topbar-logo img { height: 26px; display: block; }
+    .topbar-meta { display: flex; gap: 18px; align-items: center; font-size: 12px; color: var(--text-dim); }
+    .topbar-meta .env {
+      background: var(--brand); color: white; padding: 3px 10px; border-radius: 4px;
+      font-weight: 700; text-transform: uppercase; letter-spacing: 1px; font-size: 11px;
+    }
+
+    .shell {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      min-height: calc(100vh - 56px);
+    }
+    .sidebar {
+      background: var(--bg-card);
+      border-right: 1px solid var(--border);
+      padding: 20px 0;
+    }
+    .sidebar button {
+      display: flex; align-items: center; gap: 10px;
+      width: 100%; padding: 12px 24px;
+      font-size: 14px; font-weight: 600;
+      color: var(--text-dim);
+      text-align: left;
+      border-left: 3px solid transparent;
+      transition: all 0.15s;
+    }
+    .sidebar button:hover { color: var(--text); background: var(--bg-card-2); }
+    .sidebar button.active { color: var(--brand); border-left-color: var(--brand); background: var(--bg-card-2); }
+    .sidebar .sidebar-icon { width: 20px; text-align: center; font-weight: 900; }
+
+    .content { padding: 28px 32px; overflow-x: hidden; }
+    .tab-view { display: none; }
+    .tab-view.active { display: block; animation: fade .2s; }
+    @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+
+    .h1 { font-weight: 900; font-size: 28px; letter-spacing: -0.5px; margin-bottom: 6px; }
+    .h2 { font-weight: 800; font-size: 20px; margin-bottom: 16px; }
+    .subtitle { color: var(--text-dim); font-size: 14px; margin-bottom: 24px; }
+    .section-title { font-size: 11px; text-transform: uppercase; letter-spacing: 2px; font-weight: 700; color: var(--text-muted); margin: 28px 0 10px; }
+
+    /* KPI cards */
+    .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 20px; }
+    .kpi-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 18px;
+    }
+    .kpi-label { font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: var(--text-dim); font-weight: 700; }
+    .kpi-value { font-size: 32px; font-weight: 900; color: var(--brand); line-height: 1.1; margin-top: 6px; font-variant-numeric: tabular-nums; }
+    .kpi-sub { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
+    /* Cards */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 10px 18px;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      transition: opacity 0.15s;
+    }
+    .btn:hover { opacity: 0.85; }
+    .btn:active { transform: scale(0.98); }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-primary { background: var(--brand); color: white; }
+    .btn-secondary { background: var(--bg-card-2); color: var(--text); border: 1px solid var(--border); }
+    .btn-danger { background: var(--danger); color: white; }
+    .btn-sm { padding: 6px 12px; font-size: 11px; }
+
+    /* Tables */
+    .table-wrap { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th {
+      background: var(--bg-card-2);
+      padding: 12px 14px; text-align: left;
+      font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: 1px;
+      color: var(--text-dim);
+      border-bottom: 1px solid var(--border);
+    }
+    td { padding: 12px 14px; border-bottom: 1px solid var(--border); }
+    tr:last-child td { border-bottom: none; }
+    tr:hover { background: var(--bg-card-2); }
+    .td-num { text-align: right; font-variant-numeric: tabular-nums; }
+
+    /* Forms */
+    .form-row { margin-bottom: 14px; }
+    .form-row label {
+      display: block;
+      font-size: 11px; text-transform: uppercase; letter-spacing: 1px;
+      color: var(--text-dim); font-weight: 700; margin-bottom: 6px;
+    }
+
+    /* Filters row */
+    .filters { display: flex; gap: 10px; margin-bottom: 18px; flex-wrap: wrap; }
+    .filters input, .filters select { max-width: 200px; }
+
+    /* Badge */
+    .badge-pill {
+      display: inline-block; padding: 3px 10px; border-radius: 10px;
+      font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+    }
+    .badge-ok { background: rgba(75, 122, 73, 0.25); color: #a0d99c; }
+    .badge-warn { background: rgba(212, 160, 23, 0.25); color: #f0c757; }
+    .badge-danger { background: rgba(139, 0, 0, 0.25); color: #ff7b7b; }
+    .badge-muted { background: var(--bg-card-2); color: var(--text-dim); }
+
+    /* Login gate */
+    #login-gate {
+      display: flex; flex-direction: column; justify-content: center; align-items: center;
+      min-height: 100vh;
+      padding: 40px 20px;
+      background: var(--bg);
+      gap: 16px;
+    }
+    #login-gate img { width: 220px; margin-bottom: 10px; }
+    #login-gate h2 { font-size: 14px; text-transform: uppercase; letter-spacing: 3px; color: var(--text-dim); font-weight: 600; }
+    #login-gate input { max-width: 320px; padding: 14px; font-size: 16px; }
+    #login-gate .btn { max-width: 320px; width: 100%; padding: 14px; }
+    #login-gate .err { color: #ff7b7b; font-size: 13px; margin-top: -8px; }
+
+    /* Spinner */
+    .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.25); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Toast */
+    #toast {
+      position: fixed; top: 70px; right: 24px;
+      background: var(--black); color: white;
+      padding: 12px 18px; border-radius: 6px;
+      font-size: 13px; font-weight: 600;
+      border: 1px solid var(--brand);
+      transform: translateX(200%);
+      transition: transform 0.25s;
+      z-index: 100; max-width: 360px;
+    }
+    #toast.show { transform: none; }
+    #toast.err { border-color: var(--danger); }
+
+    /* Content edit view */
+    .editor-grid { display: grid; grid-template-columns: 240px 1fr; gap: 20px; }
+    .editor-list {
+      background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px;
+      max-height: 70vh; overflow-y: auto;
+    }
+    .editor-list-item {
+      padding: 10px 14px; border-bottom: 1px solid var(--border);
+      cursor: pointer; font-size: 13px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .editor-list-item:hover { background: var(--bg-card-2); }
+    .editor-list-item.selected { background: var(--bg-card-2); border-left: 3px solid var(--brand); padding-left: 11px; }
+    .editor-list-item .dia { font-weight: 700; color: var(--brand); font-variant-numeric: tabular-nums; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; }
+    .editor-list-item .preview { color: var(--text-muted); font-size: 11px; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px; }
+
+    /* Mobile */
+    @media (max-width: 900px) {
+      .shell { grid-template-columns: 1fr; }
+      .sidebar {
+        position: fixed; bottom: 0; left: 0; right: 0;
+        display: flex; overflow-x: auto;
+        padding: 0; border-top: 1px solid var(--border); border-right: none;
+        z-index: 20;
+      }
+      .sidebar button { padding: 12px 14px; font-size: 12px; white-space: nowrap; border-left: none; border-bottom: 3px solid transparent; }
+      .sidebar button.active { border-left: none; border-bottom-color: var(--brand); }
+      .content { padding: 20px 16px 80px; }
+      .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+      .editor-grid { grid-template-columns: 1fr; }
+      .editor-list { max-height: 300px; }
+    }
   </style>
 </head>
 <body>
-<!--
-  ABAS DO ADMIN (proteger com ADMIN_KEY via prompt no load):
-    1. Content      — editar provocações dia a dia (upsert em Supabase)
-    2. Users        — listar, filtrar por estado/profissão/plano, exportar CSV
-    3. WhatsApp     — testar envio, submeter templates, ver logs (status delivery)
-    4. Demographics — gráficos de distribuição (Chart.js ou Recharts)
-    5. Financial    — receita, churn, LTV, conversão Hotmart
-    6. Hooked       — retenção por coorte (Heatmap D1-D30-D60-D90)
-    7. Investor     — KPIs macro (MAU, DAU, ARPU, streak médio, etc.)
--->
+
+<!-- LOGIN GATE -->
 <div id="login-gate">
-  <input type="password" placeholder="Admin key" id="admin-key">
-  <button onclick="unlock()">Entrar</button>
+  <img src="https://res.cloudinary.com/dlzrfhwin/image/upload/f_auto,q_auto,w_640/v1776770398/legendiario-mark-orange_kex0ij.png" alt="LEGENDIARIO">
+  <h2>Admin Console</h2>
+  <input type="password" id="admin-key-input" placeholder="Admin key" autocomplete="off">
+  <button class="btn btn-primary" id="admin-unlock">Entrar</button>
+  <div class="err" id="login-err"></div>
 </div>
+
+<!-- DASHBOARD -->
 <div id="dashboard" style="display:none">
-  <!-- 7 abas + charts -->
+  <div class="topbar">
+    <div style="display:flex; align-items:center; gap:16px;">
+      <div class="topbar-logo">
+        <img src="https://res.cloudinary.com/dlzrfhwin/image/upload/f_auto,q_auto,w_260/v1776770398/legendiario-mark-orange_kex0ij.png" alt="LEGENDIARIO">
+      </div>
+      <span class="env">Admin</span>
+    </div>
+    <div class="topbar-meta">
+      <span id="last-refresh">—</span>
+      <button class="btn btn-secondary btn-sm" id="btn-refresh">↻ Atualizar</button>
+      <button class="btn btn-secondary btn-sm" onclick="localStorage.removeItem('admin_key'); location.reload();">Sair</button>
+    </div>
+  </div>
+
+  <div class="shell">
+    <nav class="sidebar">
+      <button data-tab="investor" class="active"><span class="sidebar-icon">▲</span> Investor</button>
+      <button data-tab="content"><span class="sidebar-icon">✎</span> Conteúdo</button>
+      <button data-tab="users"><span class="sidebar-icon">◉</span> Usuários</button>
+      <button data-tab="demographics"><span class="sidebar-icon">◎</span> Demografia</button>
+      <button data-tab="hooked"><span class="sidebar-icon">✦</span> Retenção</button>
+      <button data-tab="financial"><span class="sidebar-icon">$</span> Financeiro</button>
+      <button data-tab="whatsapp"><span class="sidebar-icon">≡</span> WhatsApp</button>
+    </nav>
+
+    <main class="content">
+      <!-- ========== INVESTOR ========== -->
+      <section class="tab-view active" id="tab-investor">
+        <h1 class="h1">Dashboard Executivo</h1>
+        <p class="subtitle">Visão macro do LEGENDIARIO em tempo real.</p>
+
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-label">Usuários totais</div>
+            <div class="kpi-value" id="inv-users">—</div>
+            <div class="kpi-sub">cadastrados no DB</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Provocações</div>
+            <div class="kpi-value" id="inv-provs">—</div>
+            <div class="kpi-sub">de 366 no ano</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Leituras</div>
+            <div class="kpi-value" id="inv-reads">—</div>
+            <div class="kpi-sub">cumulativas</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Ações criadas</div>
+            <div class="kpi-value" id="inv-actions">—</div>
+            <div class="kpi-sub">compromissos totais</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="h2">Status do sistema</div>
+          <div id="health-check" style="font-family: monospace; font-size: 12px; line-height: 1.8;">
+            Carregando…
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="h2">Autores</div>
+          <div id="autores-list">Carregando…</div>
+        </div>
+      </section>
+
+      <!-- ========== CONTENT (editar provocações) ========== -->
+      <section class="tab-view" id="tab-content">
+        <h1 class="h1">Conteúdo</h1>
+        <p class="subtitle">Edita as 366 provocações. Ctrl+S pra salvar.</p>
+
+        <div class="filters">
+          <input type="search" id="content-search" placeholder="Buscar por texto, autor, referência…">
+          <select id="content-filter-mes">
+            <option value="">Todos os meses</option>
+            <option value="1">Janeiro</option><option value="2">Fevereiro</option><option value="3">Março</option>
+            <option value="4">Abril</option><option value="5">Maio</option><option value="6">Junho</option>
+            <option value="7">Julho</option><option value="8">Agosto</option><option value="9">Setembro</option>
+            <option value="10">Outubro</option><option value="11">Novembro</option><option value="12">Dezembro</option>
+          </select>
+          <select id="content-filter-autor">
+            <option value="">Todos os autores</option>
+          </select>
+        </div>
+
+        <div class="editor-grid">
+          <div class="editor-list" id="content-list"></div>
+          <div id="content-editor">
+            <p class="subtitle">Seleciona uma provocação à esquerda pra editar.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========== USERS ========== -->
+      <section class="tab-view" id="tab-users">
+        <h1 class="h1">Usuários</h1>
+        <p class="subtitle">Criar novos usuários e gerenciar os existentes.</p>
+
+        <div class="card">
+          <div class="h2">Criar usuário</div>
+          <div style="display:grid; grid-template-columns: 1fr 1fr auto; gap: 10px; align-items: end;">
+            <div class="form-row">
+              <label>Email</label>
+              <input type="email" id="new-user-email" placeholder="email@exemplo.com">
+            </div>
+            <div class="form-row">
+              <label>Senha inicial</label>
+              <input type="text" id="new-user-password" placeholder="min. 6 chars">
+            </div>
+            <div class="form-row">
+              <button class="btn btn-primary" id="btn-create-user">Criar</button>
+            </div>
+          </div>
+          <p class="subtitle" style="margin: 0; font-size: 12px;">
+            Usuário criado já vem com email confirmado (sem precisar clicar em link).
+          </p>
+        </div>
+
+        <div class="filters">
+          <input type="search" id="users-search" placeholder="Buscar por email/nome…">
+          <button class="btn btn-secondary" id="btn-export-users">Export CSV</button>
+        </div>
+
+        <div class="table-wrap">
+          <table id="users-table">
+            <thead>
+              <tr>
+                <th>Email</th><th>Nome</th><th>WA</th><th>Hora</th>
+                <th>Profissão</th><th>Cidade/UF</th><th>Criado</th><th class="td-num">Lidos</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ========== DEMOGRAPHICS ========== -->
+      <section class="tab-view" id="tab-demographics">
+        <h1 class="h1">Demografia</h1>
+        <p class="subtitle">Distribuição da base em tempo real.</p>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+          <div class="card">
+            <div class="h2">Por estado</div>
+            <div id="demo-estado"></div>
+          </div>
+          <div class="card">
+            <div class="h2">Por profissão</div>
+            <div id="demo-profissao"></div>
+          </div>
+          <div class="card">
+            <div class="h2">Hora do WhatsApp preferida</div>
+            <div id="demo-hora"></div>
+          </div>
+          <div class="card">
+            <div class="h2">Gênero</div>
+            <div id="demo-genero"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========== HOOKED ========== -->
+      <section class="tab-view" id="tab-hooked">
+        <h1 class="h1">Retenção por coorte</h1>
+        <p class="subtitle">Heatmap D1 · D7 · D14 · D30 · D60 · D90 (em construção).</p>
+        <div class="card">
+          <p class="subtitle">Este painel exige coorte histórica. Entra em operação assim que houver usuários reais há pelo menos 30 dias.</p>
+          <p style="margin-top:14px; font-size:13px; color:var(--text-dim);">
+            Métricas previstas:<br>
+            • D1, D7, D14, D30, D60, D90 retention rate<br>
+            • Streak médio por coorte<br>
+            • Churn semana a semana<br>
+            • Horário de pico de leitura<br>
+            • Taxa de compartilhamento (share rate)
+          </p>
+        </div>
+      </section>
+
+      <!-- ========== FINANCIAL ========== -->
+      <section class="tab-view" id="tab-financial">
+        <h1 class="h1">Financeiro</h1>
+        <p class="subtitle">Integração Hotmart (ativa quando produto for configurado).</p>
+
+        <div class="kpi-grid">
+          <div class="kpi-card"><div class="kpi-label">Receita total</div><div class="kpi-value">R$ —</div><div class="kpi-sub">ativa após Hotmart</div></div>
+          <div class="kpi-card"><div class="kpi-label">ARPU</div><div class="kpi-value">R$ —</div><div class="kpi-sub">—</div></div>
+          <div class="kpi-card"><div class="kpi-label">Chargebacks</div><div class="kpi-value">—</div><div class="kpi-sub">últimos 30 dias</div></div>
+          <div class="kpi-card"><div class="kpi-label">Reembolsos</div><div class="kpi-value">—</div><div class="kpi-sub">últimos 30 dias</div></div>
+        </div>
+
+        <div class="card">
+          <p class="subtitle" style="margin:0;">Requer webhook Hotmart ativo + produto cadastrado. Me avisa quando tiver <code>HOTMART_WEBHOOK_SECRET</code> e <code>HOTMART_PRODUCT_ID</code> pra ligar a integração.</p>
+        </div>
+      </section>
+
+      <!-- ========== WHATSAPP ========== -->
+      <section class="tab-view" id="tab-whatsapp">
+        <h1 class="h1">WhatsApp</h1>
+        <p class="subtitle">Templates, testes de envio e logs de entrega.</p>
+
+        <div class="card">
+          <div class="h2">Status da integração</div>
+          <div id="wa-status" style="font-family: monospace; font-size: 13px;">Verificando…</div>
+        </div>
+
+        <div class="card">
+          <div class="h2">Teste de envio</div>
+          <div style="display:grid; grid-template-columns: 1fr 1fr auto; gap: 10px; align-items: end;">
+            <div class="form-row">
+              <label>Número (E.164)</label>
+              <input id="wa-test-phone" placeholder="+5511999999999">
+            </div>
+            <div class="form-row">
+              <label>Template</label>
+              <select id="wa-test-template">
+                <option value="util_ritmo_dia7">util_ritmo_dia7</option>
+                <option value="util_ritmo_dia21">util_ritmo_dia21</option>
+                <option value="util_conquista_ofensiva">util_conquista_ofensiva</option>
+                <option value="util_conquista_share">util_conquista_share</option>
+                <option value="util_conquista_acao">util_conquista_acao</option>
+                <option value="util_conquista_ciclo">util_conquista_ciclo</option>
+                <option value="util_ranking_top10_entrou">util_ranking_top10_entrou</option>
+                <option value="util_ranking_top3_entrou">util_ranking_top3_entrou</option>
+                <option value="util_ranking_top3_saiu">util_ranking_top3_saiu</option>
+              </select>
+            </div>
+            <div class="form-row">
+              <button class="btn btn-primary" id="btn-wa-test" disabled>Enviar teste</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="h2">Logs recentes</div>
+          <div id="wa-logs">—</div>
+        </div>
+      </section>
+    </main>
+  </div>
 </div>
+
+<div id="toast"></div>
+
 <script>
-  async function apiCall(path, opts = {}) {
-    return fetch(path, { ...opts, headers: { ...opts.headers, 'X-Admin-Key': localStorage.getItem('admin_key') }});
+// ============ API helpers ============
+const $ = s => document.querySelector(s);
+const $$ = s => document.querySelectorAll(s);
+let ADMIN_KEY = localStorage.getItem('admin_key') || '';
+let STATE = { provocacoes: [], autores: [], users: [], health: null };
+
+function toast(msg, isErr = false) {
+  const el = $('#toast');
+  el.textContent = msg;
+  el.className = isErr ? 'show err' : 'show';
+  setTimeout(() => el.className = '', 3500);
+}
+
+async function api(path, opts = {}) {
+  const res = await fetch(path, {
+    ...opts,
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Admin-Key': ADMIN_KEY,
+      ...(opts.headers || {})
+    },
+  });
+  if (!res.ok) {
+    const t = await res.text();
+    throw new Error(`${res.status}: ${t.slice(0, 200)}`);
   }
+  return res.json();
+}
+
+function escapeHtml(s) {
+  const d = document.createElement('div');
+  d.textContent = s == null ? '' : String(s);
+  return d.innerHTML;
+}
+
+// ============ LOGIN ============
+$('#admin-unlock').onclick = async () => {
+  const k = $('#admin-key-input').value.trim();
+  if (!k) return;
+  ADMIN_KEY = k;
+  try {
+    // Tenta um endpoint protegido pra validar
+    await api('/api/admin/stats');
+    localStorage.setItem('admin_key', k);
+    $('#login-gate').style.display = 'none';
+    $('#dashboard').style.display = 'block';
+    loadAll();
+  } catch (e) {
+    $('#login-err').textContent = 'Admin key inválido';
+  }
+};
+$('#admin-key-input').onkeydown = e => { if (e.key === 'Enter') $('#admin-unlock').click(); };
+
+// Auto-unlock se já tiver key salvo
+if (ADMIN_KEY) {
+  (async () => {
+    try {
+      await api('/api/admin/stats');
+      $('#login-gate').style.display = 'none';
+      $('#dashboard').style.display = 'block';
+      loadAll();
+    } catch (e) {
+      localStorage.removeItem('admin_key');
+      ADMIN_KEY = '';
+    }
+  })();
+}
+
+// ============ NAVIGATION ============
+$$('.sidebar button').forEach(b => {
+  b.onclick = () => {
+    $$('.sidebar button').forEach(x => x.classList.toggle('active', x === b));
+    $$('.tab-view').forEach(v => v.classList.toggle('active', v.id === 'tab-' + b.dataset.tab));
+    const tab = b.dataset.tab;
+    if (tab === 'content') renderContent();
+    if (tab === 'users') renderUsers();
+    if (tab === 'demographics') renderDemographics();
+    if (tab === 'whatsapp') renderWhatsApp();
+  };
+});
+
+// ============ LOAD ALL ============
+async function loadAll() {
+  try {
+    const [stats, health, autores, provs] = await Promise.all([
+      api('/api/admin/stats'),
+      fetch('/api/health').then(r => r.json()),
+      fetch('/api/autores').then(r => r.json()),
+      fetch('/api/provocacoes/full').then(r => r.json()),
+    ]);
+    STATE.health = health;
+    STATE.autores = autores;
+    STATE.provocacoes = provs;
+
+    // Investor
+    $('#inv-users').textContent = stats.users;
+    $('#inv-provs').textContent = stats.provocacoes;
+    $('#inv-reads').textContent = stats.reads;
+    $('#inv-actions').textContent = stats.actions;
+    $('#last-refresh').textContent = 'Atualizado ' + new Date().toLocaleTimeString('pt-BR');
+
+    // Health
+    const h = health.checks || {};
+    $('#health-check').innerHTML = [
+      `<div>supabase_configured: ${h.supabase_configured ? '✅' : '❌'}</div>`,
+      `<div>supabase_db_reachable: ${h.supabase_db_reachable ? '✅' : '❌'}</div>`,
+      `<div>whatsapp_configured: ${h.whatsapp_configured ? '✅' : '⚠️ pendente'}</div>`,
+      `<div>cloudinary_configured: ${h.cloudinary_configured ? '✅' : '❌'}</div>`,
+      `<div>admin_key_set: ${h.admin_key_set ? '✅' : '❌'}</div>`,
+      `<div style="color:var(--text-muted); margin-top:8px">uptime: ${Math.round(health.uptime_seconds / 60)}min · env: ${health.env}</div>`,
+    ].join('');
+
+    // Autores
+    $('#autores-list').innerHTML = `
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>#</th><th>Nome</th><th>Arquétipo</th><th>Instagram</th><th>Cor</th></tr></thead>
+          <tbody>
+            ${autores.map(a => `
+              <tr>
+                <td style="font-variant-numeric: tabular-nums;">${escapeHtml(a.numero_registro)}</td>
+                <td style="font-weight:600;">${escapeHtml(a.nome)}</td>
+                <td><span class="badge-pill badge-muted">${escapeHtml(a.arquetipo)}</span></td>
+                <td style="font-family: monospace; color: var(--text-dim);">${escapeHtml(a.instagram)}</td>
+                <td><span style="display:inline-block; width:16px; height:16px; border-radius:4px; background:${a.cor_hex}; vertical-align:middle;"></span> <code style="font-size:11px;">${a.cor_hex}</code></td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    `;
+
+    // Filter autores dropdown
+    $('#content-filter-autor').innerHTML = '<option value="">Todos os autores</option>' + autores.map(a => `<option value="${a.slug}">${escapeHtml(a.nome)}</option>`).join('');
+  } catch (e) {
+    toast('Erro ao carregar: ' + e.message, true);
+  }
+}
+
+// ============ CONTENT EDITOR ============
+let selectedProvId = null;
+
+function renderContent() {
+  const q = ($('#content-search').value || '').toLowerCase();
+  const mes = $('#content-filter-mes').value;
+  const slug = $('#content-filter-autor').value;
+
+  const filtered = STATE.provocacoes.filter(p => {
+    if (mes && String(p.mes) !== mes) return false;
+    if (slug && p.autor_slug !== slug) return false;
+    if (q) {
+      const hay = [p.texto, p.pergunta, p.citacao, p.autor_citacao, p.autor_dia].join(' ').toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  }).sort((a, b) => a.dia_ano.localeCompare(b.dia_ano));
+
+  $('#content-list').innerHTML = filtered.map(p => `
+    <div class="editor-list-item ${p.id === selectedProvId ? 'selected' : ''}" data-id="${p.id}">
+      <div>
+        <div class="dia">${p.dia_ano}</div>
+        <div class="preview">${escapeHtml(p.autor_dia)} · ${escapeHtml((p.pergunta||'').slice(0,40))}</div>
+      </div>
+    </div>
+  `).join('') || '<p class="subtitle" style="padding:16px;">Nenhum resultado</p>';
+
+  $$('.editor-list-item').forEach(el => {
+    el.onclick = () => {
+      selectedProvId = el.dataset.id;
+      renderContent();
+      renderEditor();
+    };
+  });
+}
+
+function renderEditor() {
+  const p = STATE.provocacoes.find(x => x.id === selectedProvId);
+  if (!p) { $('#content-editor').innerHTML = '<p class="subtitle">Seleciona uma provocação à esquerda pra editar.</p>'; return; }
+
+  $('#content-editor').innerHTML = `
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:14px;">
+        <div>
+          <div style="font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:2px;">Dia ${p.dia_ano}</div>
+          <h2 class="h2" style="margin:4px 0 0;">${escapeHtml(p.autor_dia)} <span style="color:var(--text-muted); font-weight:500; font-size:14px;">Nº ${escapeHtml(p.autor_numero)}</span></h2>
+        </div>
+        <button class="btn btn-danger btn-sm" id="btn-delete-prov">Deletar</button>
+      </div>
+
+      <div class="form-row">
+        <label>Autor (slug)</label>
+        <select id="edit-autor-slug">
+          ${STATE.autores.map(a => `<option value="${a.slug}" ${a.slug === p.autor_slug ? 'selected' : ''}>${escapeHtml(a.nome)} — Nº ${a.numero_registro}</option>`).join('')}
+        </select>
+      </div>
+
+      <div class="form-row">
+        <label>Citação bíblica</label>
+        <input id="edit-citacao" value="${escapeHtml(p.citacao)}" placeholder="Dai-me, pois, agora este monte.">
+      </div>
+      <div class="form-row">
+        <label>Referência</label>
+        <input id="edit-autor-citacao" value="${escapeHtml(p.autor_citacao)}" placeholder="Josué 14:12">
+      </div>
+
+      <div class="form-row">
+        <label>Pergunta provocadora</label>
+        <textarea id="edit-pergunta" style="min-height:60px">${escapeHtml(p.pergunta)}</textarea>
+      </div>
+
+      <div class="form-row">
+        <label>Texto desenvolvido</label>
+        <textarea id="edit-texto" style="min-height:220px">${escapeHtml(p.texto)}</textarea>
+      </div>
+
+      <div class="form-row">
+        <label>Aspas finais do autor</label>
+        <textarea id="edit-aspas-autor" style="min-height:60px">${escapeHtml(p.aspas_autor || '')}</textarea>
+      </div>
+
+      <div style="display:flex; gap:10px; margin-top:20px;">
+        <button class="btn btn-primary" id="btn-save-prov">Salvar alterações</button>
+        <button class="btn btn-secondary" onclick="renderEditor()">Descartar</button>
+      </div>
+    </div>
+  `;
+
+  $('#btn-save-prov').onclick = async () => {
+    const patch = {
+      autor_slug: $('#edit-autor-slug').value,
+      citacao: $('#edit-citacao').value,
+      autor_citacao: $('#edit-autor-citacao').value,
+      pergunta: $('#edit-pergunta').value,
+      texto: $('#edit-texto').value,
+      aspas_autor: $('#edit-aspas-autor').value,
+    };
+    const a = STATE.autores.find(x => x.slug === patch.autor_slug);
+    if (a) { patch.autor_dia = a.nome; patch.autor_numero = a.numero_registro; patch.instagram = a.instagram; }
+    const btn = $('#btn-save-prov'); btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>';
+    try {
+      const updated = await api(`/api/admin/provocacao/${p.id}`, { method: 'PATCH', body: JSON.stringify(patch) });
+      Object.assign(p, updated);
+      toast('Salvo');
+      renderContent();
+    } catch (e) {
+      toast('Erro: ' + e.message, true);
+    } finally {
+      btn.disabled = false; btn.textContent = 'Salvar alterações';
+    }
+  };
+
+  $('#btn-delete-prov').onclick = async () => {
+    if (!confirm(`Deletar provocação do dia ${p.dia_ano}? Essa ação não tem undo.`)) return;
+    try {
+      await api(`/api/admin/provocacao/${p.id}`, { method: 'DELETE' });
+      STATE.provocacoes = STATE.provocacoes.filter(x => x.id !== p.id);
+      selectedProvId = null;
+      renderContent();
+      $('#content-editor').innerHTML = '<p class="subtitle">Provocação deletada.</p>';
+      toast('Deletada');
+    } catch (e) { toast('Erro: ' + e.message, true); }
+  };
+}
+
+$('#content-search').oninput = renderContent;
+$('#content-filter-mes').onchange = renderContent;
+$('#content-filter-autor').onchange = renderContent;
+
+// ============ USERS ============
+async function renderUsers() {
+  try {
+    const data = await api('/api/admin/users');
+    STATE.users = data;
+    const q = ($('#users-search').value || '').toLowerCase();
+    const filtered = q ? data.filter(u => (u.email||'').toLowerCase().includes(q) || (u.nome||'').toLowerCase().includes(q)) : data;
+    $('#users-table tbody').innerHTML = filtered.map(u => `
+      <tr>
+        <td style="font-family:monospace; font-size:12px;">${escapeHtml(u.email)}</td>
+        <td>${escapeHtml(u.nome || '—')}</td>
+        <td style="font-family:monospace; font-size:12px;">${escapeHtml(u.telefone || '—')}</td>
+        <td>${u.whatsapp_hour || '—'}h</td>
+        <td>${escapeHtml(u.profissao || '—')}</td>
+        <td>${escapeHtml([u.cidade, u.estado].filter(Boolean).join('/') || '—')}</td>
+        <td style="font-size:12px; color:var(--text-dim);">${u.created_at ? new Date(u.created_at).toLocaleDateString('pt-BR') : '—'}</td>
+        <td class="td-num">${u.reads_count || 0}</td>
+      </tr>
+    `).join('') || '<tr><td colspan="8" style="text-align:center; padding:30px; color:var(--text-muted);">Nenhum usuário cadastrado ainda</td></tr>';
+  } catch (e) { toast('Erro: ' + e.message, true); }
+}
+
+$('#btn-create-user').onclick = async () => {
+  const email = $('#new-user-email').value.trim();
+  const password = $('#new-user-password').value;
+  if (!email || password.length < 6) { toast('Email + senha 6+ chars', true); return; }
+  const btn = $('#btn-create-user'); btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>';
+  try {
+    await api('/api/admin/create-user', { method: 'POST', body: JSON.stringify({ email, password }) });
+    toast('Usuário criado: ' + email);
+    $('#new-user-email').value = ''; $('#new-user-password').value = '';
+    renderUsers();
+    loadAll();
+  } catch (e) {
+    toast('Erro: ' + e.message, true);
+  } finally {
+    btn.disabled = false; btn.textContent = 'Criar';
+  }
+};
+
+$('#users-search').oninput = renderUsers;
+
+$('#btn-export-users').onclick = () => {
+  const csv = [
+    ['email','nome','telefone','whatsapp_hour','profissao','cidade','estado','reads_count','created_at'].join(','),
+    ...STATE.users.map(u => [u.email, u.nome, u.telefone, u.whatsapp_hour, u.profissao, u.cidade, u.estado, u.reads_count, u.created_at].map(x => `"${(x||'').toString().replace(/"/g, '""')}"`).join(','))
+  ].join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'legendiario-users.csv';
+  a.click();
+};
+
+// ============ DEMOGRAPHICS ============
+async function renderDemographics() {
+  try {
+    const data = await api('/api/admin/demographics');
+    const renderList = (el, arr, fmt) => {
+      if (!arr.length) { $(el).innerHTML = '<p class="subtitle" style="margin:0;">Sem dados ainda</p>'; return; }
+      const max = Math.max(...arr.map(x => x.count));
+      $(el).innerHTML = arr.map(x => `
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px; font-size:13px;">
+          <div style="width:100px; color:var(--text-dim);">${escapeHtml(fmt ? fmt(x.key) : x.key)}</div>
+          <div style="flex:1; background:var(--bg-card-2); height:6px; border-radius:3px; overflow:hidden;">
+            <div style="height:100%; background:var(--brand); width:${(x.count/max)*100}%"></div>
+          </div>
+          <div style="width:40px; text-align:right; font-weight:700; font-variant-numeric:tabular-nums;">${x.count}</div>
+        </div>
+      `).join('');
+    };
+    renderList('#demo-estado', data.estado || []);
+    renderList('#demo-profissao', data.profissao || []);
+    renderList('#demo-hora', (data.whatsapp_hour || []).map(x => ({ key: x.key + 'h', count: x.count })));
+    renderList('#demo-genero', data.genero || []);
+  } catch (e) { toast('Erro: ' + e.message, true); }
+}
+
+// ============ WHATSAPP ============
+async function renderWhatsApp() {
+  try {
+    const s = await api('/api/admin/whatsapp-status');
+    $('#wa-status').innerHTML = `
+      <div>Token: ${s.token_configured ? '✅' : '❌ ausente'}</div>
+      <div>Phone Number ID: ${s.phone_configured ? '✅' : '❌ ausente'}</div>
+      <div>WABA ID: ${s.waba_configured ? '✅' : '❌ ausente'}</div>
+      <div>API: ${s.api_version || 'v22.0'}</div>
+    `;
+    $('#btn-wa-test').disabled = !s.token_configured || !s.phone_configured;
+
+    // Logs
+    $('#wa-logs').innerHTML = (s.recent_logs && s.recent_logs.length)
+      ? `<div class="table-wrap"><table><thead><tr><th>Data</th><th>Phone</th><th>Template</th><th>Status</th><th>Erro</th></tr></thead><tbody>${s.recent_logs.map(l => `<tr><td style="font-size:12px; color:var(--text-dim);">${new Date(l.created_at).toLocaleString('pt-BR')}</td><td style="font-family:monospace; font-size:12px;">${escapeHtml(l.telefone)}</td><td>${escapeHtml(l.template)}</td><td><span class="badge-pill badge-${l.status === 'sent' ? 'ok' : l.status === 'failed' ? 'danger' : 'warn'}">${escapeHtml(l.status)}</span></td><td style="font-size:11px; color:var(--text-muted);">${escapeHtml(l.error_message || '')}</td></tr>`).join('')}</tbody></table></div>`
+      : '<p class="subtitle" style="margin:0;">Nenhum envio registrado</p>';
+  } catch (e) { toast('Erro: ' + e.message, true); }
+}
+
+$('#btn-wa-test').onclick = async () => {
+  const phone = $('#wa-test-phone').value.trim();
+  const template = $('#wa-test-template').value;
+  if (!phone || !template) return;
+  const btn = $('#btn-wa-test'); btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>';
+  try {
+    await api('/api/admin/whatsapp-test', { method: 'POST', body: JSON.stringify({ phone, template }) });
+    toast('Enviado pra ' + phone);
+    setTimeout(renderWhatsApp, 1500);
+  } catch (e) { toast('Erro: ' + e.message, true); }
+  finally { btn.disabled = false; btn.textContent = 'Enviar teste'; }
+};
+
+// ============ REFRESH ============
+$('#btn-refresh').onclick = loadAll;
 </script>
 </body>
 </html>
