@@ -700,8 +700,11 @@
        REDESIGN v2 — Apple/Oura, masculino, LEGENDIARIO palette
        ======================================================== */
     .d-shell { max-width: 520px; margin: 0 auto; padding: 20px 20px 100px; }
-    .d-topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
-    .d-brand-mark { height: 22px; display: block; opacity: 0.95; }
+    .d-topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; gap: 16px; }
+    .d-brand-mark { height: 20px; width: auto; max-width: 150px; object-fit: contain; display: block; opacity: 0.95; flex-shrink: 1; }
+
+    /* Esconde o topbar antigo do app shell (era redundante com o d-topbar da view Hoje) */
+    #app > .topbar { display: none; }
 
     .d-display { font-family: 'Fraunces', serif; font-size: 46px; font-weight: 500; line-height: 1; letter-spacing: -1.5px; color: #fff; }
     .d-display-sub { font-size: 15px; color: var(--text-dim); margin-top: 4px; font-weight: 500; text-transform: capitalize; }
