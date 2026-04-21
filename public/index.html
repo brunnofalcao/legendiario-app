@@ -197,26 +197,70 @@
       display: none;
       flex-direction: column;
       justify-content: center;
-      padding: 40px 28px;
+      padding: 40px 24px;
       background: var(--bg);
       max-width: 520px;
       margin: 0 auto;
     }
     #login-view.active { display: flex; }
-    .login-logo { display: block; width: 80%; max-width: 280px; margin: 0 auto 32px; }
+    .login-logo-wrap {
+      text-align: center;
+      margin: 0 auto 28px;
+      padding: 0 8px;
+      width: 100%;
+    }
+    .login-logo {
+      display: inline-block;
+      width: auto;
+      max-width: min(320px, 85%);
+      height: auto;
+      object-fit: contain;
+      vertical-align: middle;
+    }
     .login-tagline {
       text-align: center;
       font-family: 'Fraunces';
       font-style: italic;
-      font-size: 18px;
+      font-size: 17px;
       color: var(--text-dim);
-      margin-bottom: 40px;
+      margin-bottom: 36px;
       line-height: 1.4;
+      padding: 0 12px;
     }
-    .login-form { display: flex; flex-direction: column; gap: 14px; }
-    .login-msg { text-align: center; padding: 12px; border-radius: 8px; font-size: 14px; display: none; }
+    .login-tabs {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 20px;
+      background: var(--bg-card);
+      padding: 4px;
+      border-radius: 8px;
+    }
+    .login-tabs button {
+      flex: 1;
+      padding: 10px;
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-dim);
+      border-radius: 6px;
+      transition: all 0.15s;
+    }
+    .login-tabs button.active { background: var(--brand); color: white; }
+    .login-form { display: flex; flex-direction: column; gap: 12px; }
+    .login-msg { text-align: center; padding: 12px; border-radius: 8px; font-size: 14px; display: none; line-height: 1.4; }
     .login-msg.ok { display: block; background: rgba(45, 74, 43, 0.3); color: #7ab87a; }
     .login-msg.err { display: block; background: rgba(139, 0, 0, 0.3); color: #ff6b6b; }
+    .login-minor-link {
+      background: transparent;
+      color: var(--text-dim);
+      font-size: 13px;
+      text-align: center;
+      padding: 8px;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+    .login-minor-link:hover { color: var(--brand); }
 
     /* ---------------------- HOJE ---------------------- */
     .hoje-header {
@@ -588,15 +632,33 @@
 
 <!-- LOGIN VIEW -->
 <div id="login-view">
-  <img src="https://res.cloudinary.com/dlzrfhwin/image/upload/v1776770398/legendiario-mark-orange_kex0ij.png" alt="LEGENDIARIO" class="login-logo">
+  <div class="login-logo-wrap">
+    <img src="https://res.cloudinary.com/dlzrfhwin/image/upload/f_auto,q_auto,w_640/v1776770398/legendiario-mark-orange_kex0ij.png" alt="LEGENDIARIO" class="login-logo">
+  </div>
   <div class="login-tagline">365 dias de confronto,<br>fé e posicionamento.</div>
-  <form class="login-form" id="login-form">
-    <input type="email" id="login-email" placeholder="teu email" required autocomplete="email" inputmode="email">
-    <button type="submit" class="btn btn-primary btn-full" id="login-submit">
-      Enviar link de acesso
-    </button>
-    <div class="login-msg" id="login-msg"></div>
+
+  <div class="login-tabs">
+    <button type="button" data-auth-tab="signin" class="active">Entrar</button>
+    <button type="button" data-auth-tab="signup">Criar conta</button>
+  </div>
+
+  <!-- SIGNIN -->
+  <form class="login-form" id="signin-form">
+    <input type="email" id="signin-email" placeholder="Email" required autocomplete="email" inputmode="email">
+    <input type="password" id="signin-password" placeholder="Senha" required autocomplete="current-password" minlength="6">
+    <button type="submit" class="btn btn-primary btn-full" id="signin-submit">Entrar</button>
+    <button type="button" class="login-minor-link" id="btn-forgot">Esqueci a senha</button>
+    <div class="login-msg" id="signin-msg"></div>
   </form>
+
+  <!-- SIGNUP -->
+  <form class="login-form" id="signup-form" style="display:none">
+    <input type="email" id="signup-email" placeholder="Email" required autocomplete="email" inputmode="email">
+    <input type="password" id="signup-password" placeholder="Criar senha (mín. 6 caracteres)" required autocomplete="new-password" minlength="6">
+    <button type="submit" class="btn btn-primary btn-full" id="signup-submit">Criar conta</button>
+    <div class="login-msg" id="signup-msg"></div>
+  </form>
+
   <p style="text-align:center; color:var(--text-muted); font-size:12px; margin-top:32px;">
     Ainda não tem acesso? <a href="https://legendiario.com" style="color:var(--brand); font-weight:600;">Começar em legendiario.com</a>
   </p>
@@ -934,12 +996,25 @@ function setAuthorColor(slug) {
 }
 
 // ============= AUTH =============
-async function sendMagicLink(email) {
-  const { error } = await supabase.auth.signInWithOtp({
+async function signUp(email, password) {
+  const { data, error } = await supabase.auth.signUp({
     email,
-    options: {
-      emailRedirectTo: window.location.origin + '/'
-    }
+    password,
+    options: { emailRedirectTo: window.location.origin + '/' }
+  });
+  if (error) throw error;
+  return data;
+}
+
+async function signIn(email, password) {
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+  if (error) throw error;
+  return data;
+}
+
+async function resetPassword(email) {
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: window.location.origin + '/'
   });
   if (error) throw error;
 }
@@ -948,6 +1023,17 @@ async function logout() {
   await supabase.auth.signOut();
   localStorage.removeItem('STATE_CACHE');
   location.reload();
+}
+
+function humanizeAuthError(err) {
+  const msg = (err?.message || '').toLowerCase();
+  if (msg.includes('invalid login')) return 'Email ou senha incorretos.';
+  if (msg.includes('user already registered')) return 'Este email já tem conta. Entra com a senha.';
+  if (msg.includes('email not confirmed')) return 'Email não confirmado. Confere tua caixa.';
+  if (msg.includes('password should be at least')) return 'Senha precisa ter pelo menos 6 caracteres.';
+  if (msg.includes('invalid email')) return 'Email inválido.';
+  if (msg.includes('rate limit')) return 'Muitas tentativas. Aguarda 1 min.';
+  return err?.message || 'Erro inesperado. Tenta de novo.';
 }
 
 // ============= DATA LOAD =============
@@ -1383,26 +1469,89 @@ function bindEvents() {
     setTimeout(() => $('#new-action-input').focus(), 200);
   };
 
-  // LOGIN
-  $('#login-form').onsubmit = async (e) => {
+  // AUTH TABS (signin / signup)
+  $$('[data-auth-tab]').forEach(b => {
+    b.onclick = () => {
+      const tab = b.dataset.authTab;
+      $$('[data-auth-tab]').forEach(x => x.classList.toggle('active', x === b));
+      $('#signin-form').style.display = tab === 'signin' ? 'flex' : 'none';
+      $('#signup-form').style.display = tab === 'signup' ? 'flex' : 'none';
+    };
+  });
+
+  // SIGNIN
+  $('#signin-form').onsubmit = async (e) => {
     e.preventDefault();
-    const email = $('#login-email').value.trim();
-    if (!email) return;
-    const btn = $('#login-submit');
+    const email = $('#signin-email').value.trim();
+    const password = $('#signin-password').value;
+    if (!email || !password) return;
+    const btn = $('#signin-submit');
     btn.disabled = true;
     btn.innerHTML = '<span class="spinner"></span>';
-    const msg = $('#login-msg');
+    const msg = $('#signin-msg');
     msg.className = 'login-msg';
     try {
-      await sendMagicLink(email);
+      await signIn(email, password);
       msg.className = 'login-msg ok';
-      msg.textContent = 'Link enviado. Confere teu email (pode tá no spam).';
+      msg.textContent = 'Autenticado. Carregando…';
+      setTimeout(() => location.reload(), 500);
     } catch (err) {
       msg.className = 'login-msg err';
-      msg.textContent = err.message || 'Erro ao enviar';
-    } finally {
+      msg.textContent = humanizeAuthError(err);
       btn.disabled = false;
-      btn.textContent = 'Enviar link de acesso';
+      btn.textContent = 'Entrar';
+    }
+  };
+
+  // SIGNUP
+  $('#signup-form').onsubmit = async (e) => {
+    e.preventDefault();
+    const email = $('#signup-email').value.trim();
+    const password = $('#signup-password').value;
+    if (!email || password.length < 6) return;
+    const btn = $('#signup-submit');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span>';
+    const msg = $('#signup-msg');
+    msg.className = 'login-msg';
+    try {
+      const data = await signUp(email, password);
+      // Se confirmação de email desativada, já vem session
+      if (data?.session) {
+        msg.className = 'login-msg ok';
+        msg.textContent = 'Conta criada. Entrando…';
+        setTimeout(() => location.reload(), 500);
+      } else {
+        msg.className = 'login-msg ok';
+        msg.textContent = 'Conta criada. Confere teu email pra confirmar, depois entra com a senha.';
+        btn.disabled = false;
+        btn.textContent = 'Criar conta';
+      }
+    } catch (err) {
+      msg.className = 'login-msg err';
+      msg.textContent = humanizeAuthError(err);
+      btn.disabled = false;
+      btn.textContent = 'Criar conta';
+    }
+  };
+
+  // FORGOT PASSWORD
+  $('#btn-forgot').onclick = async () => {
+    const email = $('#signin-email').value.trim();
+    const msg = $('#signin-msg');
+    msg.className = 'login-msg';
+    if (!email) {
+      msg.className = 'login-msg err';
+      msg.textContent = 'Digita teu email no campo acima primeiro.';
+      return;
+    }
+    try {
+      await resetPassword(email);
+      msg.className = 'login-msg ok';
+      msg.textContent = 'Link de redefinição enviado pro teu email.';
+    } catch (err) {
+      msg.className = 'login-msg err';
+      msg.textContent = humanizeAuthError(err);
     }
   };
 
