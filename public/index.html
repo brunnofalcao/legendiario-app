@@ -25,25 +25,108 @@
 
   <style>
     :root {
-      --brand: #FF4D14;
-      --brand-dark: #D63C0A;
-      --black: #0A0A0A;
-      --bg: #0A0A0A;
-      --bg-card: #1A1A1A;
-      --bg-card-2: #252525;
-      --text: #FFFFFF;
-      --text-dim: #9A9A9A;
-      --text-muted: #5A5A5A;
+      /* === Design System v1 — Senior Designer tokens === */
+      /* Bg */
+      --bg-primary: #0A0A0A;
+      --bg-secondary: #161616;
+      --bg-tertiary: #1F1F1F;
+      /* Text */
+      --text-primary: #FFFFFF;
+      --text-secondary: #B3B3B3;
+      --text-tertiary: #808080;
+      /* Accents */
+      --accent-orange: #FF4D14;
+      --accent-orange-dark: #CC3D10;
+      --accent-amber: #F59E0B;
+      --accent-olive-dark: #333D26;
+      --accent-olive-med: #4B5320;
+      --accent-sand: #6B5D4F;
+      --accent-khaki: #8B7E66;
+      /* States */
+      --state-success: #4B7A49;
+      --state-warning: #F59E0B;
+      --state-danger: #8B0000;
+      --state-info: #3B82F6;
+      /* Spacing (4px grid) */
+      --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px;
+      --space-5: 20px; --space-6: 24px; --space-7: 28px; --space-8: 32px; --space-10: 40px;
+      /* Radius */
+      --radius-sm: 12px; --radius-md: 16px; --radius-lg: 20px; --radius-xl: 24px; --radius-pill: 999px;
+      /* Shadows */
+      --elev-1: 0 4px 12px rgba(0,0,0,0.5);
+      --elev-2: 0 8px 24px rgba(0,0,0,0.6);
+      --elev-3: 0 12px 40px rgba(0,0,0,0.7);
+      --glow-fire: 0 0 20px rgba(245,158,11,0.3);
+      /* Easings */
+      --ease-out: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      --ease-in-out: cubic-bezier(0.42, 0, 0.58, 1);
+      --ease-in: cubic-bezier(0.42, 0, 1, 1);
+
+      /* === Aliases retrocompat (mantém CSS antigo funcionando) === */
+      --brand: var(--accent-orange);
+      --brand-dark: var(--accent-orange-dark);
+      --black: var(--bg-primary);
+      --bg: var(--bg-primary);
+      --bg-card: var(--bg-secondary);
+      --bg-card-2: var(--bg-tertiary);
+      --text: var(--text-primary);
+      --text-dim: var(--text-secondary);
+      --text-muted: var(--text-tertiary);
       --border: #2A2A2A;
-      --ok: #2D4A2B;
-      --danger: #8B0000;
-      --warn: #D4A017;
-      --camo-olive: #4B5320;
-      --camo-sand: #6B5D4F;
-      --camo-khaki: #8B7E66;
-      --camo-dark: #333D26;
-      --author-color: var(--brand);
+      --ok: var(--state-success);
+      --danger: var(--state-danger);
+      --warn: var(--state-warning);
+      --camo-olive: var(--accent-olive-med);
+      --camo-sand: var(--accent-sand);
+      --camo-khaki: var(--accent-khaki);
+      --camo-dark: var(--accent-olive-dark);
+      --author-color: var(--accent-orange);
     }
+
+    /* Reduced motion — fallback pra quem prefere menos movimento */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+
+    /* Micro-press em botões (feedback tátil visual) */
+    button, .d-lido-badge, .d-btn-insta, .d-btn-share, .read-btn, .btn, .tab-bar button {
+      transition: transform 150ms var(--ease-out), opacity 150ms var(--ease-out);
+    }
+    button:active:not(:disabled), .d-lido-badge:active:not(:disabled),
+    .d-btn-insta:active:not(:disabled), .d-btn-share:active:not(:disabled),
+    .read-btn:active:not(:disabled), .btn:active:not(:disabled) {
+      transform: scale(0.97);
+    }
+
+    /* Streak pill com glow amber (senior spec: thermal glow) */
+    .d-streak-pill {
+      box-shadow: var(--glow-fire);
+      transition: transform 250ms var(--ease-out), box-shadow 250ms var(--ease-out);
+    }
+    .d-streak-pill:hover { transform: translateY(-1px); box-shadow: 0 0 28px rgba(245,158,11,0.45); }
+
+    /* Elevation nos cards principais */
+    .d-card, .d-prov, .d-acao-card, .card {
+      box-shadow: var(--elev-1);
+    }
+
+    /* Focus-visible (acessibilidade WCAG) */
+    button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible, a:focus-visible {
+      outline: 2px solid var(--accent-orange);
+      outline-offset: 2px;
+      border-radius: 4px;
+    }
+
+    /* Tap target mínimo 44×44 (Apple HIG) */
+    button, a, input[type="checkbox"], input[type="radio"], .tab-bar button, .check {
+      min-height: 36px;
+    }
+    .tab-bar button { min-height: 48px; }
 
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
