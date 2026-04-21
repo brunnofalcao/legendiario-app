@@ -701,7 +701,15 @@
        ======================================================== */
     .d-shell { max-width: 520px; margin: 0 auto; padding: 20px 20px 100px; }
     .d-topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; gap: 16px; }
-    .d-brand-mark { height: 20px; width: auto; max-width: 150px; object-fit: contain; display: block; opacity: 0.95; flex-shrink: 1; }
+    .d-brand-mark {
+      display: block !important;
+      width: 130px !important;
+      height: auto !important;
+      max-width: 130px !important;
+      object-fit: contain !important;
+      flex-shrink: 0 !important;
+      opacity: 0.95;
+    }
 
     /* Esconde o topbar antigo do app shell (era redundante com o d-topbar da view Hoje) */
     #app > .topbar { display: none; }
@@ -827,7 +835,7 @@
     <div class="d-shell">
       <!-- Topbar: logo + streak -->
       <div class="d-topbar">
-        <img src="https://res.cloudinary.com/dlzrfhwin/image/upload/f_auto,q_auto,w_260/v1776770398/legendiario-mark-orange_kex0ij.png" alt="LEGENDIARIO" class="d-brand-mark">
+        <img src="https://res.cloudinary.com/dlzrfhwin/image/upload/v1776770399/legendiario-mark_giwvkg.svg" alt="LEGENDIARIO" class="d-brand-mark" width="130" height="22">
         <span class="d-streak-pill">🔥 <span id="streak-n">0</span></span>
       </div>
 
